@@ -17,17 +17,16 @@ export class PedidoService {
     ) {}
 
     public async getAllPedidos(): Promise<Pedido[]> {
-        const result = this.pedidoRepository.find();
         return await this.pedidoRepository.find();
     }
 
     public async getPedido(id: number): Promise<Pedido> {
         try {
-            const result = await this.pedidoRepository.createQueryBuilder('pedido')
-                                                        .where(
-                                                            'pedido.id = :id', { id }
-                                                        )
-                                                        .getOne();
+            const result = await this.pedidoRepository
+                .createQueryBuilder('pedido')
+                .where('pedido.idPedido = :id', { id })
+                .getOne();
+
             if (!result) {
                 throw new Error(`Pedido con id ${id} no encontrado`);
             }
@@ -39,6 +38,10 @@ export class PedidoService {
     }
 
     public async create(pedidoDto: PedidoDTO): Promise<Pedido> {
+        if ((pedidoDto as any).idPedido !== undefined) {
+            throw new Error('No está permitido definir manualmente el id del pedido');
+        }
+        
         const pedido = new Pedido();
         pedido.fecha = new Date();
         pedido.subtotal = pedidoDto.subtotal;
@@ -73,5 +76,10 @@ export class PedidoService {
       
         return result.affected === 0 ? undefined : result;
       }
+
+    public async delete(id: number): Promise<boolean> {
+        const result = await this.pedidoRepository.delete(id);
+        return result.affected !== 0;
+    }
       
 }

@@ -1,3 +1,5 @@
+import { Cliente } from 'src/controllers/database/entities/cliente.entity.ts'
+
 export interface IPedidoResponse {
     idPedido: number;
     fecha: Date;
@@ -6,6 +8,6 @@ export interface IPedidoResponse {
     total: number;
     tiempoEstimado: string;
     estadoPedido: string;
-    cliente: number;
+    cliente: Cliente;
 }
 

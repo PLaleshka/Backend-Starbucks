@@ -1,8 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put, Res, Delete } from '@nestjs/common';
 import { IPedidoResponse as IGetPedidoResponse } from './dto/IGetPedidoResponse';
-import { IPostPedidoRequest } from './dto/IPostPedidoRequest';
-import { IPostPedidoResponse } from './dto/IPostPedidoResponse';
-import { IPutPedidoRequest } from './dto/IPutPedidoRequest';
 import { Response } from 'express';
 import { PedidoService } from 'src/providers/pedido/pedido.service';
 import { PedidoDTO } from './dto/pedido.dto';
@@ -13,8 +10,10 @@ import { plainToInstance } from 'class-transformer';
 import { PedidoResponseDTO } from './dto/PedidoResponseDTO';
 
 
+
 @Controller('Pedido') 
 export class PedidoController {
+    constructor(private readonly pedidoService: PedidoService) {}
     private pedidos: IGetPedidoResponse[] = [
         {
             idPedido: 1,
@@ -24,7 +23,14 @@ export class PedidoController {
             total: 119,
             tiempoEstimado: '30 minutos',
             estadoPedido: 'En preparación',
-            cliente: 1,
+            cliente: {
+                idCliente: 1,
+                nombre: 'Juan Pérez',
+                apellido: 'Gómez',
+                correoElectronico: 'juanperez@example.com',
+                contraseña: 'password',
+                pedidos: []
+              },
         },
         {
             idPedido: 2,
@@ -32,23 +38,19 @@ export class PedidoController {
             subtotal: 200,
             iva: 38,
             total: 238,
-            tiempoEstimado: '45 minutos',
-            estadoPedido: 'En camino',
-            cliente: 2,
-        },
-        {
-            idPedido: 3,
-            fecha: new Date(),
-            subtotal: 300,
-            iva: 57,
-            total: 357,
-            tiempoEstimado: '60 minutos',
-            estadoPedido: 'Entregado',
-            cliente: 3,
+            tiempoEstimado: '30 minutos',
+            estadoPedido: 'En preparación',
+            cliente: {
+                idCliente: 2,
+                nombre: 'María López',
+                apellido: 'Hernández',
+                correoElectronico: 'marialopez@example.com',
+                contraseña: 'securepassword',
+                pedidos: []
+              },
         },
     ];
 
-    constructor(private pedidoService: PedidoService) {}
 
     @Get()
     public getpedidos(): IGetPedidoResponse[] {
@@ -56,15 +58,10 @@ export class PedidoController {
     }
 
     @Get(':id')
-    public getpedido(@Param('id') id: number): IGetPedidoResponse {
-            const pedido = this.pedidos.find(
-                c => c.idPedido === Number(id)
-            );
-            if (!pedido) {
-                throw new Error(`pedido con id ${Number(id)} no encontrado`);
-            }
-            return pedido;
+    public async getPedido(@Param('id') id: number): Promise<IGetPedidoResponse> {
+        return await this.pedidoService.getPedido(Number(id));
     }
+
     
 
     @Post()
@@ -86,21 +83,14 @@ export class PedidoController {
     @Delete(':id')
     async deletepedido(@Param('id') id: number, @Res() response: Response): Promise<Response> {
         if (isNaN(id)) return response.status(400).send();
-    
-        let isPedidoFound: boolean = false;
 
-        this.pedidos.filter(
-            (pedido) => {
-                if (pedido.idPedido == id) {
-                    this.pedidos.splice(pedido.idPedido, 1);
-                    isPedidoFound = true;
-                }
-            }
-        );
+        const result = await this.pedidoService.delete(Number(id)); // usamos el servicio, no el repositorio
 
-        if (!isPedidoFound) return response.status(404).send();
-        
-        return response.status(200).send();
+        if (!result) {
+            return response.status(404).send({ message: 'Pedido no encontrado' });
+        }
+
+        return response.status(200).send({ message: 'Pedido eliminado correctamente' });
     }
 }
 

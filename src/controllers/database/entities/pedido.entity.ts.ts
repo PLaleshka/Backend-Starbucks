@@ -1,9 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { ManyToOne, JoinColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Cliente } from 'src/controllers/database/entities/cliente.entity.ts';
-//import { Tienda } from 'src/controllers/database/entities/tienda.entity.ts';
-import { OneToMany } from 'typeorm';
-//import { PedidoProducto } from 'src/controllers/database/entities/pedido-producto.entity.ts';
 import { Expose } from 'class-transformer';
 
 @Entity({ name: 'pedidos' })
@@ -15,31 +11,28 @@ export class Pedido {
     @CreateDateColumn({ name: 'fecha_pedido' })
     fecha!: Date;
 
-    @Column({ name: 'subtotal' })
+    @Column({ name: 'subtotal', type: 'decimal', precision: 10, scale: 2, nullable: false })
     subtotal!: number;
 
-    @Column({ name: 'iva' })
+    @Column({ name: 'iva', type: 'decimal', precision: 10, scale: 2, nullable: false })
     iva!: number;
 
     @Expose() 
     get total(): number {
-        return this.subtotal + this.iva;
+        return Number(this.subtotal) + Number(this.iva);
     }
 
-    @Column({ name: 'tiempo_estimado' })
+    @Column({ name: 'tiempo_estimado', length: 50, nullable: false })
     tiempoEstimado!: string;
 
-    @Column({ name: 'estado_pedido' })
+    @Column({ name: 'estado_pedido', length: 30, nullable: false })
     estadoPedido!: string;
 
-    @ManyToOne(() => Cliente, cliente => cliente.pedidos, { eager: true })
+    @ManyToOne(() => Cliente, cliente => cliente.pedidos, {
+        eager: true,
+        nullable: false,
+        onDelete: 'CASCADE', // <- elimina el pedido si el cliente es borrado
+    })
     @JoinColumn({ name: 'id_cliente' })
     cliente!: Cliente;
-
-    //@ManyToOne(() => Tienda, tienda => tienda.pedidos)
-    //@JoinColumn({ name: 'id_tienda' })
-    //tienda!: Tienda;
-
-    //@OneToMany(() => PedidoProducto, pp => pp.pedido)
-    //pedidosProductos: PedidoProducto[];
 }

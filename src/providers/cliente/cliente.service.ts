@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { Cliente } from 'src/controllers/database/entities/cliente.entity.ts';
 import { ClienteUpdateDTO } from 'src/controllers/cliente/dto/ClienteUpdateDTO';
+import { plainToInstance } from 'class-transformer';
+import { ClienteDTO } from 'src/controllers/cliente/dto/cliente.dto';
 
 @Injectable()
 export class ClienteService {
@@ -18,11 +20,11 @@ export class ClienteService {
 
     public async getCliente(id: number): Promise<Cliente> {
         try {
-            const result = await this.clienteRepository.createQueryBuilder('cliente')
-                                                        .where(
-                                                            'cliente.id = :id', { id }
-                                                        )
-                                                        .getOne();
+            const result = await this.clienteRepository
+                .createQueryBuilder('cliente')
+                .where('cliente.idCliente = :id', { id })
+                .getOne();
+
             if (!result) {
                 throw new Error(`Cliente con id ${id} no encontrado`);
             }
@@ -33,9 +35,9 @@ export class ClienteService {
         }
     }
 
-    public async create(cliente: Cliente): Promise<Cliente> {
-        const result = this.clienteRepository.create(cliente);
-        return await this.clienteRepository.save(result);
+    public async create(dto: ClienteDTO): Promise<Cliente> {
+        const cliente = plainToInstance(Cliente, dto);
+        return await this.clienteRepository.save(cliente);
     }
 
     public async update(id: number, cliente: ClienteUpdateDTO): Promise<UpdateResult | undefined> {
@@ -47,5 +49,10 @@ export class ClienteService {
     
         // Devuelve el cliente actualizado desde la base de datos
         return result;
+    }
+
+    public async delete(id: number): Promise<boolean> {
+        const cliente = await this.clienteRepository.delete(id);
+        return cliente.affected !== 0;
     }
 }
