@@ -1,4 +1,4 @@
-import { Cliente } from 'src/controllers/database/entities/cliente.entity.ts'
+import { Cliente } from 'src/controllers/database/entities/cliente.entity'
 
 export interface IPedidoResponse {
     idPedido: number;

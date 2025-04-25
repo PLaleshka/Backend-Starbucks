@@ -1,5 +1,6 @@
 import { IsDate, IsNotEmpty, IsNumber, IsString, IsPositive, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
+import { FindOperator } from 'typeorm';
 
 export class PedidoDTO {
     @IsNotEmpty()
@@ -20,7 +21,7 @@ export class PedidoDTO {
     @IsOptional()
     @IsNumber()
     @IsPositive()
-    total?: number;
+    total!: number;
 
     @IsNotEmpty()
     @IsString()
@@ -34,5 +35,7 @@ export class PedidoDTO {
     @IsNumber()
     @IsPositive()
     cliente!: number;
+    tienda: number | FindOperator<number> | undefined;
+    barista?: number | FindOperator<number> | undefined;
 }
 

@@ -5,10 +5,9 @@ import { IGetClienteResponse } from './dto/IGetClienteResponse';
 import { Response } from 'express';
 import { ClienteService } from 'src/providers/cliente/cliente.service';
 import { ClienteDTO } from './dto/cliente.dto';
-import { Cliente } from 'src/controllers/database/entities/cliente.entity.ts';
+import { Cliente } from 'src/controllers/database/entities/cliente.entity';
 import { ClienteUpdateDTO } from './dto/ClienteUpdateDTO';
 import { UpdateResult } from 'typeorm';
-
 
 
 @Controller('cliente')
@@ -30,7 +29,7 @@ export class ClienteController {
         }
     ];
 
-    constructor(private readonly clienteService: ClienteService) {}
+    constructor(private clienteService: ClienteService) {}
 
     @Get()
     public getClientes(): IGetClienteResponse[] {
@@ -38,27 +37,40 @@ export class ClienteController {
     }
 
     @Get(':id')
-    public async getCliente(@Param('id') id: number): Promise<IGetClienteResponse> {
-        return await this.clienteService.getCliente(id);
+    public getCliente(@Param('id') id: number): IGetClienteResponse {
+        const cliente = this.clientes.find(
+            c => c.idCliente === Number(id)
+        );
+        if (!cliente) {
+            throw new Error(`Cliente con id ${Number(id)} no encontrado`);
+        }
+        return cliente;
     }
 
     @Post()
-    async postCliente(@Body() request: ClienteDTO): Promise<IPostClienteResponse> {
+    async postCliente(
+        @Body() request: ClienteDTO
+    ): Promise<IPostClienteResponse> {
         const response: IPostClienteResponse = {
             data: null,
-            statusCode: 200,
+            statusCode: 200, 
             statusDescription: 'Cliente creado correctamente',
             errors: null,
         };
 
-        try {
-            const clienteCreado = await this.clienteService.create(request);
-        } catch (error) {
-            response.statusCode = 500;
-            response.statusDescription = 'Error al crear el cliente';
-            response.errors = [error instanceof Error ? error.message : 'Error desconocido'];
-        }
+        if (request) {
+            const newCliente: Cliente = new Cliente()
+            Object.assign(newCliente, request);
 
+            await this.clienteService.create(newCliente);
+            
+            return response;
+        } 
+        else {
+            response.statusCode = 400;
+            response.statusDescription = 'Solicitud inválida';
+            response.errors = ['El cuerpo de la solicitud está vacío o es incorrecto'];
+        }
         return response;
     }
 
@@ -76,12 +88,20 @@ export class ClienteController {
     async deleteCliente(@Param('id') id: number, @Res() response: Response): Promise<Response> {
         if (isNaN(id)) return response.status(400).send();
 
-        const result = await this.clienteService.delete(Number(id)); 
+        let isClienteFound: boolean = false;
 
-        if (!result) {
-            return response.status(404).send({ message: 'Cliente no encontrado' });
-        }
+        this.clientes.filter(
+            (cliente) => {
+                if (cliente.idCliente == id) {
+                    this.clientes.splice(cliente.idCliente, 1)
+                    isClienteFound = true;
+                }
+            }
+        );
 
-        return response.status(200).send({ message: 'Cliente eliminado correctamente' });
+        if (!isClienteFound) 
+            return response.status(404).send();
+
+        return response.status(200).send();
     }
 }
