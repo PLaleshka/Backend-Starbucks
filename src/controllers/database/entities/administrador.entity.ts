@@ -1,23 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Tienda } from './tienda.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { TiendaEntity } from "src/controllers/database/entities/tienda.entity";
 
 @Entity({ name: 'administrador' })
 export class AdministradorEntity {
-  @PrimaryGeneratedColumn({ name: 'id_administrador' })
-  idAdministrador!: number;
+    @PrimaryGeneratedColumn()
+    id!: number;
 
-  @Column()
-  nombre!: string;
+    @Column()
+    nombre!: string;
 
-  @Column()
-  apellido!: string;
+    @Column()
+    apellido!: string;
 
-  @Column()
-  contraseña!: string;
+    @Column()
+    contraseña!: string;
 
-  @Column({ name: 'correo_electronico', unique: true })
-  correoElectronico!: string;
+    @Column()
+    correoElectronico!: string;
 
-  @OneToMany(() => Tienda, tienda => tienda.administrador)
-  tiendas!: Tienda[];
+    @OneToMany(() => TiendaEntity, tienda => tienda.administrador)
+    tiendas!: TiendaEntity[];
 }

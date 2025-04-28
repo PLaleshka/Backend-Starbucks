@@ -1,10 +1,33 @@
+import { IsString, IsNotEmpty, IsInt, IsEmail, IsIn, IsOptional } from 'class-validator';
 
-export interface IPostTiendaRequest{
-    nombreTienda: string;
-    horario: string;
-    ubicacion: string;
-    capacidad: number;
-    disponibilidad: string;
-    correoElectronico: string;
-    contraseña: string;
+export class IPostTiendaRequest {
+  @IsString()
+  @IsNotEmpty()
+  nombreTienda!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  horario!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ubicacion!: string;
+
+  @IsInt()
+  capacidad!: number;
+
+  @IsIn(['disponible', 'no disponible'])
+  disponibilidad!: string;
+
+  @IsEmail()
+  correoElectronico!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  contraseña!: string;
+
+  // Validación para asegurarnos de que idAdministrador no es opcional y puede ser nulo
+  @IsNotEmpty()
+  @IsInt()
+  idAdministrador!: number | null;
 }

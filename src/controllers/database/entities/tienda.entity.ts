@@ -1,37 +1,33 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { Administrador } from './administrador.entity';
-import { Pedido } from './pedido.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { AdministradorEntity } from "src/controllers/database/entities/administrador.entity";
 
 @Entity({ name: 'tienda' })
-export class Tienda {
-  @PrimaryGeneratedColumn({ name: 'id_tienda' })
-  idTienda!: number;
+export class TiendaEntity {
+    @PrimaryGeneratedColumn()
+    idTienda!: number;
 
-  @Column({ name: 'nombre' })
-  nombre!: string;
+    @Column()
+    nombreTienda!: string;
 
-  @Column()
-  horario!: string;
+    @Column()
+    horario!: string;
 
-  @Column()
-  ubicacion!: string;
+    @Column()
+    ubicacion!: string;
 
-  @Column()
-  capacidad!: number;
+    @Column()
+    capacidad!: number;
 
-  @Column()
-  disponibilidad!: string;
+    @Column()
+    disponibilidad!: string;
 
-  @Column({ name: 'correo_electronico', unique: true })
-  correoElectronico!: string;
+    @Column()
+    correoElectronico!: string;
 
-  @Column()
-  contraseña!: string;
+    @Column()
+    contraseña!: string;
 
-  @ManyToOne(() => Administrador, admin => admin.tiendas, { eager: true })
-  @JoinColumn({ name: 'id_administrador' })
-  administrador!: Administrador;
-
-  @OneToMany(() => Pedido, pedido => pedido.tienda)
-  pedidos!: Pedido[];
+    @ManyToOne(() => AdministradorEntity, administrador => administrador.tiendas, {
+    })
+    administrador!: AdministradorEntity;
 }

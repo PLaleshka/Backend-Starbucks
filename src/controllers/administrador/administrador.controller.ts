@@ -13,26 +13,29 @@ export class AdministradorController {
     constructor(private administradorService: AdministradorService){}
 
     @Post()
-    async postUser(@Body() request: IPostAdministradorRequest): Promise<IPostAdministradorResponse>{
-        console.log('@POST')
+    async postUser(@Body() request: IPostAdministradorRequest): Promise<IPostAdministradorResponse> {
+        console.log('@POST');
+    
+        if (!request) {
+            throw new Error('Solicitud inválida: No se proporcionaron datos');
+        }
+    
         const response: IPostAdministradorResponse = {
             data: null,
             statusCode: 200,
             statusDescription: 'Usuario agregado',
             erros: null
         };
-
-        if(request) {
-            const newAdmin: AdministradorEntity = {
-                nombre: request.nombre,
-                apellido: request.apellido,
-                correoElectronico: request.correoElectronico,
-                contraseña: request.contraseña,
-            } as AdministradorEntity;
-
-            await this.administradorService.create(newAdmin);
-            return response;
-        }
+    
+        const newAdmin: AdministradorEntity = {
+            nombre: request.nombre,
+            apellido: request.apellido,
+            correoElectronico: request.correoElectronico,
+            contraseña: request.contraseña,
+        } as AdministradorEntity;
+    
+        await this.administradorService.create(newAdmin);
+        return response;
     }
     
     @Get()
