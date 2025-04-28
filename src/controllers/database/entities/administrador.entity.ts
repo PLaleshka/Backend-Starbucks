@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Tienda } from './tienda.entity';
 
 @Entity({ name: 'administrador' })
-export class Administrador {
+export class AdministradorEntity {
   @PrimaryGeneratedColumn({ name: 'id_administrador' })
   idAdministrador!: number;
 
