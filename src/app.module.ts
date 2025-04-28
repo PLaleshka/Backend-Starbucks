@@ -12,8 +12,8 @@ import { ClienteService } from './providers/cliente/cliente.service';
 import { PedidoService } from './providers/pedido/pedido.service';
 import { TiendaService } from './providers/tienda/tienda.service';
 import { AdministradorService } from './providers/administrador/administrador.service';
-import { Administrador } from './controllers/database/entities/administrador.entity';
-import { Tienda } from './controllers/database/entities/tienda.entity';
+import { AdministradorEntity } from './controllers/database/entities/administrador.entity';
+import { TiendaEntity } from './controllers/database/entities/tienda.entity';
 import { TiendaController } from './controllers/tienda/tienda.controller';
 import { AdministradorController } from './controllers/administrador/administrador.controller';
 import { Producto } from './controllers/database/entities/producto.entity';
@@ -40,13 +40,13 @@ import { DetallePedido } from './controllers/database/entities/detalle-pedido.en
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
-        entities: [Cliente, Pedido, Administrador, Tienda, Producto, Barista, DetallePedido],
+        entities: [Cliente, Pedido, AdministradorEntity, TiendaEntity, Producto, Barista, DetallePedido],
         synchronize: true,
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Cliente, Pedido, Administrador, Tienda, Producto, Barista, DetallePedido]),
+    TypeOrmModule.forFeature([Cliente, Pedido, AdministradorEntity, TiendaEntity, Producto, Barista, DetallePedido]),
     ControllersModule,
   ],
   controllers: [AppController, ClienteController, PedidoController, TiendaController, AdministradorController,
