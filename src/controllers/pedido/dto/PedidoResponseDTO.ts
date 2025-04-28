@@ -1,6 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { DetallePedido } from '../../database/entities/detalle-pedido.entity';
-import { Tienda } from '../../database/entities/tienda.entity';
+import { TiendaEntity } from '../../database/entities/tienda.entity';
 
 export class PedidoResponseDTO {
   @Expose()
@@ -30,8 +30,8 @@ export class PedidoResponseDTO {
   cliente: any;
 
   @Expose()
-  @Type(() => Tienda)
-  tienda!: Tienda;
+  @Type(() => TiendaEntity)
+  tienda!: TiendaEntity;
 
   @Expose()
   @Type(() => DetallePedido)
