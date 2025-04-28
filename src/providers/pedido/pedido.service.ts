@@ -6,7 +6,7 @@ import { Cliente } from 'src/controllers/database/entities/cliente.entity';
 import { PedidoUpdateDTO } from 'src/controllers/pedido/dto/PedidoUpdateDTO';
 import { PedidoDTO } from 'src/controllers/pedido/dto/pedido.dto';
 import { Barista } from 'src/controllers/database/entities/barista.entity';
-import { Tienda } from 'src/controllers/database/entities/tienda.entity';
+import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
 
 @Injectable()
 export class PedidoService {
@@ -20,8 +20,8 @@ export class PedidoService {
         @InjectRepository(Barista)
         private readonly baristaRepository: Repository<Barista>,
 
-        @InjectRepository(Tienda)
-        private readonly tiendaRepository: Repository<Tienda>,
+        @InjectRepository(TiendaEntity)
+        private readonly tiendaRepository: Repository<TiendaEntity>,
     ) {}
 
     public async getAllPedidos(): Promise<Pedido[]> {
