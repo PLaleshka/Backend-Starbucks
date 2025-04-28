@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { AdministradorEntity } from "src/controllers/database/entities/administrador.entity";
+import { Pedido } from "./pedido.entity";
 
 @Entity({ name: 'tienda' })
 export class TiendaEntity {
@@ -30,4 +31,7 @@ export class TiendaEntity {
     @ManyToOne(() => AdministradorEntity, administrador => administrador.tiendas, {
     })
     administrador!: AdministradorEntity;
+
+    @OneToMany(() => Pedido, pedido => pedido.tienda)
+    pedidos!: Pedido[];
 }
