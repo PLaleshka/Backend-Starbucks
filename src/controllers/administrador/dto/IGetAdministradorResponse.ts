@@ -5,3 +5,5 @@ export interface IGetAdministradorResponse {
     correoElectronico: string;
     contraseña: string;
 }
+
+//una pruebita
