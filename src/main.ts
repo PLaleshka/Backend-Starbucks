@@ -5,16 +5,17 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe(
-    {
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }
-  ));
+  // Usamos la opción 'transform' para habilitar la conversión automática de tipos.
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, 
+      forbidNonWhitelisted: true, 
+    }),
+  );
     
   app.setGlobalPrefix('api');
 
   await app.listen(3000);
 }
+
 bootstrap();

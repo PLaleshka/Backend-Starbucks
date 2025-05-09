@@ -15,6 +15,10 @@ export class RegisterRequestDTO {
     apellido!: string;
 
     @IsNotEmpty()
+    @IsString()
+    numeroCelular!: string;
+
+    @IsNotEmpty()
     @IsEmail()
     correoElectronico!: string;
 

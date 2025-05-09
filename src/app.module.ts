@@ -25,6 +25,8 @@ import { BaristaService } from './providers/barista/barista.service';
 import { DetallePedidoController } from './controllers/detalle-pedido/detalle-pedido.controller';
 import { DetallePedidoService } from './providers/detalle-pedido/detalle-pedido.service';
 import { DetallePedido } from './controllers/database/entities/detalle-pedido.entity';
+import { LoginController } from './controllers/login/login.controller';
+import { LoginService } from './providers/login/login.service';
 
 @Module({
   imports: [
@@ -50,10 +52,10 @@ import { DetallePedido } from './controllers/database/entities/detalle-pedido.en
     ControllersModule,
   ],
   controllers: [AppController, ClienteController, PedidoController, TiendaController, AdministradorController,
-    ProductoController, BaristaController, DetallePedidoController
+    ProductoController, BaristaController, DetallePedidoController, LoginController
   ],
   providers: [AppService, ClienteService, PedidoService, AdministradorService, TiendaService, 
-    ProductoService, BaristaService, DetallePedidoService
+    ProductoService, BaristaService, DetallePedidoService, LoginService
   ],
 })
 export class AppModule {}

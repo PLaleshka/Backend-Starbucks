@@ -3,8 +3,8 @@ import { Type } from 'class-transformer';
 
 export class PedidoUpdateDTO {
     @IsOptional()
-    @Type(() => Date)
     @IsDate()
+    @Type(() => Date)
     fecha!: Date;
 
     @IsOptional()
@@ -34,4 +34,14 @@ export class PedidoUpdateDTO {
     @IsNumber()
     @IsPositive()
     cliente!: number;
+
+    @IsOptional()
+    @IsNumber()
+    @IsPositive()
+    tienda?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @IsPositive()
+    barista?: number;
 }

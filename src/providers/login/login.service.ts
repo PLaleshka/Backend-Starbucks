@@ -1,6 +1,6 @@
 import { Injectable, HttpException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Cliente } from "src/controllers/database/entities/cliente.entity.ts";
+import { Cliente } from "src/controllers/database/entities/cliente.entity";
 import { Repository } from "typeorm";
 import { hash, compare} from "bcrypt";
 import { RegisterRequestDTO } from "src/controllers/login/dto/register-request.dto";
