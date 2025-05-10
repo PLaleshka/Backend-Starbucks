@@ -10,10 +10,13 @@ export class Producto {
   nombre!: string;
 
   @Column()
-  tipo!: string;
+  categoria!: string;
+
+  @Column({ nullable: true })
+  descripcion!: string;
 
   @Column()
-  descripcion!: string;
+  precio!: number;
 
   @Column({ name: 'tiempo_base' })
   tiempoBase!: number;

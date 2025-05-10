@@ -1,43 +1,67 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete, NotFoundException } from '@nestjs/common';
 import { ProductoService } from 'src/providers/producto/producto.service';
-import { IPostProductoRequest } from './dto/IPostProductoRequest';
-import { IPostProductoResponse } from './dto/IpostProductoResponse';
+import { ProductoDTO } from './dto/producto.dto';
+import { ProductoUpdateDTO } from './dto/ProductoUpdateDTO';
 import { Producto } from 'src/controllers/database/entities/producto.entity';
-import { Get } from '@nestjs/common';
+import { UpdateResult, DeleteResult } from 'typeorm';
 
 @Controller('producto')
 export class ProductoController {
+    constructor(private productoService: ProductoService) {}
 
-  constructor(private productoService: ProductoService) {}
-
-  @Post()
-  async postProducto(@Body() request: IPostProductoRequest): Promise<IPostProductoResponse> {
-    console.log('@POST producto');
-    
-    const response: IPostProductoResponse = {
-      data: null,
-      statusCode: 200,
-      statusDescription: 'Producto agregado',
-      errores: null,
-    };
-
-    if (request) {
-      const nuevoProducto: Producto = {
-        nombre: request.nombre,
-        tipo: request.tipo,
-        descripcion: request.descripcion,
-        tiempo_estimado: request.tiempo_estimado,
-      } as unknown as Producto;
-
-      const productoCreado = await this.productoService.create(nuevoProducto);
-      response.data = productoCreado;
+    @Get()
+    async getProductos(): Promise<Producto[]> {
+        return await this.productoService.getAllProductos();
     }
 
-    return response;
-  }
+    @Get(':id')
+    async getProducto(@Param('id') id: number): Promise<Producto> {
+        const producto = await this.productoService.getProducto(id);
+        if (!producto) {
+            throw new NotFoundException(`Producto con id ${id} no encontrado`);
+        }
+        return producto;
+    }
 
-  @Get()
-async getProductos(): Promise<Producto[]> {
-  return await this.productoService.findAll();
-}
+    @Post()
+    async postProducto(@Body() request: ProductoDTO) {
+        if (request) {
+            const newProducto = await this.productoService.create(request);
+            return {
+                statusCode: 201,
+                message: 'Producto creado correctamente',
+                data: newProducto
+            };
+        }
+        return {
+            statusCode: 400,
+            message: 'Solicitud inválida',
+            errors: ['El cuerpo de la solicitud está vacío o es incorrecto']
+        };
+    }
+
+    @Put(':id')
+    async putProducto(
+        @Param('id') id: number,
+        @Body() request: ProductoUpdateDTO,
+    ): Promise<UpdateResult> {
+        const result = await this.productoService.update(id, request);
+
+        if (!result) {
+            throw new NotFoundException(`Producto con id ${id} no encontrado o no modificado`);
+        }
+
+        return result;
+    }
+
+    @Delete(':id')
+    async deleteProducto(@Param('id') id: number): Promise<{ message: string }> {
+        const result = await this.productoService.delete(id);
+
+        if (result.affected === 0) {
+            throw new NotFoundException(`Producto con id ${id} no encontrado`);
+        }
+
+        return { message: `Producto con id ${id} eliminado correctamente` };
+    }
 }
