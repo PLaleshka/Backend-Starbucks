@@ -28,7 +28,7 @@ export class PedidoController {
                 idCliente: 1,
                 nombre: 'Juan',
                 apellido: 'Pérez',
-                numeroCelular: '+56912345678',
+                numeroCelular: '+56912345699',
                 correoElectronico: 'juan.perez@example.com',
                 contraseña: 'juanPassword', 
                 pedidos: [], 
