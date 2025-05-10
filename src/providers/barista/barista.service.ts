@@ -1,22 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Barista } from 'src/controllers/database/entities/barista.entity';
-import { Repository } from 'typeorm';
+import { BaristaUpdateDTO } from 'src/controllers/barista/dto/BaristaUpdateDTO';
 
 @Injectable()
 export class BaristaService {
-  constructor(
-    @InjectRepository(Barista)
-    private readonly baristaRepository: Repository<Barista>,
-  ) {}
+    constructor(
+        @InjectRepository(Barista)
+        private readonly baristaRepository: Repository<Barista>,
+    ) {}
 
-  async create(barista: Barista): Promise<Barista> {
-    const nuevo = this.baristaRepository.create(barista);
-    return await this.baristaRepository.save(nuevo);
-  }
+    public async getAllBaristas(): Promise<Barista[]> {
+        return await this.baristaRepository.find();
+    }
 
-  async getAllBaristas(): Promise<Barista[]> {
-    return await this.baristaRepository.find();
+    public async getBarista(id: number): Promise<Barista> {
+        try {
+            const result = await this.baristaRepository.createQueryBuilder('barista')
+                .where('barista.id = :id', { id })
+                .getOne();
+
+            if (!result) {
+                throw new Error(`Barista con id ${id} no encontrado`);
+            }
+
+            return result;
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
+
+    public async create(barista: Barista): Promise<Barista> {
+        const result = this.baristaRepository.create(barista);
+        return await this.baristaRepository.save(result);
+    }
+
+    public async update(id: number, baristaDto: BaristaUpdateDTO): Promise<UpdateResult | undefined> {
+        const result: UpdateResult = await this.baristaRepository.update(id, baristaDto);
+
+        if (result.affected === 0) {
+            return undefined;
+        }
+
+        return result;
+    }
+
+    public async delete(id: number): Promise<DeleteResult> {
+      return await this.baristaRepository.delete(id);
   }
-  
 }
