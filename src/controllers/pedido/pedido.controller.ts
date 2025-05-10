@@ -27,6 +27,7 @@ export class PedidoController {
             cliente: {
                 idCliente: 1,
                 nombre: 'Juan',
+                numeroCelular: '9283883',
                 apellido: 'Pérez',
                 correoElectronico: 'juan.perez@example.com',
                 contraseña: 'juanPassword', 
@@ -45,6 +46,7 @@ export class PedidoController {
                 idCliente: 2,
                 nombre: 'María',
                 apellido: 'González',
+                numeroCelular: '9283883',
                 correoElectronico: 'maria.gonzalez@example.com',
                 contraseña: 'mariaPassword',
                 pedidos: [],
@@ -63,6 +65,7 @@ export class PedidoController {
                 idCliente: 3,
                 nombre: 'Carlos',
                 apellido: 'Ramírez',
+                numeroCelular: '9283883',
                 correoElectronico: 'carlos.ramirez@example.com',
                 contraseña: 'carlosPassword',
                 pedidos: [],
