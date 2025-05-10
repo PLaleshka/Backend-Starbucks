@@ -10,6 +10,10 @@ export class ClienteUpdateDTO {
     apellido!: string;
 
     @IsOptional()
+    @IsString()
+    numeroCelular!: string;
+
+    @IsOptional()
     @IsEmail()
     correoElectronico!: string;
 

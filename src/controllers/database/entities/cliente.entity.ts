@@ -12,6 +12,9 @@ export class Cliente {
   @Column()
   apellido!: string;
 
+  @Column({ unique: true })
+  numeroCelular!: string;
+
   @Column({ name: 'correo_electronico', unique: true })
   correoElectronico!: string;
 

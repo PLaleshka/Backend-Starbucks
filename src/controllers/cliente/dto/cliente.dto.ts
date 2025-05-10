@@ -10,6 +10,10 @@ export class ClienteDTO {
     apellido!: string;
 
     @IsNotEmpty()
+    @IsString()
+    numeroCelular!: string;
+
+    @IsNotEmpty()
     @IsEmail()
     correoElectronico!: string;
 

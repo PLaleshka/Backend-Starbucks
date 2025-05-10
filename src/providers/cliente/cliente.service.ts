@@ -12,7 +12,6 @@ export class ClienteService {
     ) {}
 
     public async getAllClientes(): Promise<Cliente[]> {
-        const result = this.clienteRepository.find();
         return await this.clienteRepository.find();
     }
 

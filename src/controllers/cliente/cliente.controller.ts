@@ -17,6 +17,7 @@ export class ClienteController {
             idCliente: 1,
             nombre: 'Juan',
             apellido: 'Pérez',
+            numeroCelular: '+56 9 82412276',
             correoElectronico: 'juan@hotmail.cl',
             contraseña: '123456',
         },
@@ -24,6 +25,7 @@ export class ClienteController {
             idCliente: 2,
             nombre: 'Juana',
             apellido: 'Pereira',
+            numeroCelular: '+56 9 82412277',
             correoElectronico: 'juana@hotmail.cl',
             contraseña: '1234567',
         }
@@ -32,9 +34,21 @@ export class ClienteController {
     constructor(private clienteService: ClienteService) {}
 
     @Get()
-    public getClientes(): IGetClienteResponse[] {
-        return this.clientes;
+    public async getClientes(): Promise<IGetClienteResponse[]> {
+        // Usar el servicio para obtener los clientes desde la base de datos
+        const clientes = await this.clienteService.getAllClientes();
+
+        return clientes.map(cliente => ({
+            idCliente: cliente.idCliente,
+            nombre: cliente.nombre,
+            apellido: cliente.apellido,
+            numeroCelular: cliente.numeroCelular,
+            correoElectronico: cliente.correoElectronico,
+            contraseña: cliente.contraseña,
+        }));
     }
+    
+
 
     @Get(':id')
     public getCliente(@Param('id') id: number): IGetClienteResponse {
