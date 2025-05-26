@@ -17,16 +17,18 @@ export class BaristaService {
 
     public async getBarista(id: number): Promise<Barista> {
         try {
-            const result = await this.baristaRepository.createQueryBuilder('barista')
-                .where('barista.id = :id', { id })
-                .getOne();
+            const result = await this.baristaRepository
+              .createQueryBuilder('barista')
+              .where('barista.idBarista = :id', { id })
+              .getOne();
 
             if (!result) {
-                throw new Error(`Barista con id ${id} no encontrado`);
+               throw new Error(`Barista con id ${id} no encontrado`);
             }
 
             return result;
         } catch (error: any) {
+            console.error('ERROR EN getBarista:', error.message);
             throw new Error(error);
         }
     }

@@ -1,15 +1,8 @@
-import {
-  IsOptional,
-  IsInt,
-  Min,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class IPutDetallePedidoRequest {
   @IsOptional()
   @IsInt()
-  @Min(1)
   cantidad?: number;
 
   @IsOptional()
@@ -34,6 +27,6 @@ export class IPutDetallePedidoRequest {
 
   @IsOptional()
   @IsString()
-  @MaxLength(100)
+  @MaxLength(255)
   extras?: string;
 }
