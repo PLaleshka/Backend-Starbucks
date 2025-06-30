@@ -12,7 +12,7 @@ export class Cliente {
   @Column()
   apellido!: string;
 
-  @Column({ unique: true })
+  @Column({ name: 'numero_celular', unique: true })
   numeroCelular!: string;
 
   @Column({ name: 'correo_electronico', unique: true })
