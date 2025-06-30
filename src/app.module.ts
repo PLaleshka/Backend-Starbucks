@@ -25,6 +25,18 @@ import { BaristaService } from './providers/barista/barista.service';
 import { DetallePedidoController } from './controllers/detalle-pedido/detalle-pedido.controller';
 import { DetallePedidoService } from './providers/detalle-pedido/detalle-pedido.service';
 import { DetallePedido } from './controllers/database/entities/detalle-pedido.entity';
+import { Ingrediente } from './controllers/database/entities/ingrediente.entity';
+import { IngredienteController } from './controllers/ingrediente/ingrediente.controller';
+import { IngredienteService } from './providers/ingrediente/ingrediente.service';
+import { Inventario } from './controllers/database/entities/inventario.entity';
+import { InventarioController } from './controllers/inventario/inventario.controller';
+import { InventarioService } from './providers/inventario/inventario.service';
+import { Receta } from './controllers/database/entities/receta.entity';
+import { RecetaController } from './controllers/receta/receta.controller';
+import { RecetaService } from './providers/receta/receta.service';
+import { Stock } from './controllers/database/entities/stock.entity';
+import { StockController } from './controllers/stock/stock.controller';
+import { StockService } from './providers/stock/stock.service';
 
 @Module({
   imports: [
@@ -46,14 +58,17 @@ import { DetallePedido } from './controllers/database/entities/detalle-pedido.en
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Cliente, Pedido, Administrador, Tienda, Producto, Barista, DetallePedido]),
+    TypeOrmModule.forFeature([Cliente, Pedido, Administrador, Tienda, Producto, Barista, DetallePedido, 
+      Ingrediente, Inventario, Receta, Stock]),
     ControllersModule,
   ],
   controllers: [AppController, ClienteController, PedidoController, TiendaController, AdministradorController,
-    ProductoController, BaristaController, DetallePedidoController
+    ProductoController, BaristaController, DetallePedidoController, IngredienteController, InventarioController,
+    RecetaController, StockController
   ],
   providers: [AppService, ClienteService, PedidoService, AdministradorService, TiendaService, 
-    ProductoService, BaristaService, DetallePedidoService
+    ProductoService, BaristaService, DetallePedidoService, IngredienteService, InventarioService,
+    RecetaService, StockService
   ],
 })
 export class AppModule {}

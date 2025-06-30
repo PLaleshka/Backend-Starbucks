@@ -1,6 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Administrador } from './administrador.entity';
 import { Pedido } from './pedido.entity';
+import { Inventario } from './inventario.entity';
+import { Stock } from './stock.entity';
 
 @Entity({ name: 'tienda' })
 export class Tienda {
@@ -34,4 +36,10 @@ export class Tienda {
 
   @OneToMany(() => Pedido, pedido => pedido.tienda)
   pedidos!: Pedido[];
+
+  @OneToMany(() => Inventario, inventario => inventario.tienda)
+  inventarios!: Inventario[];
+
+  @OneToMany(() => Stock, stock => stock.tienda)
+stocks!: Stock[];
 }

@@ -4,11 +4,6 @@ import { FindOperator } from 'typeorm';
 
 export class PedidoDTO {
     @IsNotEmpty()
-    @Type(() => Date)
-    @IsDate()
-    fecha!: Date;
-
-    @IsNotEmpty()
     @IsNumber()
     @IsPositive()
     subtotal!: number;
