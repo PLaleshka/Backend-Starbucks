@@ -1,10 +1,9 @@
 import {
   IsInt,
-  IsString,
-  IsNotEmpty,
   Min,
-  MaxLength,
   IsOptional,
+  IsString,
+  MaxLength,
 } from 'class-validator';
 
 export class IPostDetallePedidoRequest {
@@ -20,28 +19,28 @@ export class IPostDetallePedidoRequest {
   @Min(1)
   cantidad!: number;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(20)
-  tamano!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(20)
-  temperatura!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(20)
-  nivelDulzura!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(20)
-  tipoLeche!: string;
+  tamano?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(100)
+  @MaxLength(20)
+  temperatura?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  nivelDulzura?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  tipoLeche?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
   extras?: string;
 }

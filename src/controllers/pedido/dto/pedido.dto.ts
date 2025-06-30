@@ -3,10 +3,13 @@ import { FindOperator } from 'typeorm';
 
 export class PedidoDTO {
     @IsNotEmpty()
+<<<<<<< HEAD
     @IsDateString()
     fecha!: Date;
 
     @IsNotEmpty()
+=======
+>>>>>>> barista-producto
     @IsNumber()
     @IsPositive()
     subtotal!: number;

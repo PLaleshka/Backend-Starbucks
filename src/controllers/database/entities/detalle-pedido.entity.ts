@@ -28,8 +28,9 @@ export class DetallePedido {
   @Column({ name: 'tipo_leche' })
   tipoLeche!: string;
 
-  @Column({ nullable: true })
-  extras?: string;
+  @Column({ nullable: true, type: 'varchar' })
+  extras!: string | null;
+
 
   @ManyToOne(() => Pedido, pedido => pedido.detallePedidos)
   @JoinColumn({ name: 'id_pedido' })
