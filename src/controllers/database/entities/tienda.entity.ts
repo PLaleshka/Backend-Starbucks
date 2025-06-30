@@ -1,14 +1,8 @@
-<<<<<<< HEAD
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { AdministradorEntity } from "src/controllers/database/entities/administrador.entity";
-import { Pedido } from "./pedido.entity";
-=======
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { Administrador } from './administrador.entity';
 import { Pedido } from './pedido.entity';
 import { Inventario } from './inventario.entity';
 import { Stock } from './stock.entity';
->>>>>>> barista-producto
+import { AdministradorEntity } from './administrador.entity';
 
 @Entity({ name: 'tienda' })
 export class TiendaEntity {
@@ -40,10 +34,6 @@ export class TiendaEntity {
     @JoinColumn({ name: 'id_administrador' }) // <- este cambio es crucial
     administrador!: AdministradorEntity;
 
-<<<<<<< HEAD
-    @OneToMany(() => Pedido, pedido => pedido.tienda)
-    pedidos!: Pedido[];
-=======
   @OneToMany(() => Pedido, pedido => pedido.tienda)
   pedidos!: Pedido[];
 
@@ -52,5 +42,4 @@ export class TiendaEntity {
 
   @OneToMany(() => Stock, stock => stock.tienda)
 stocks!: Stock[];
->>>>>>> barista-producto
 }

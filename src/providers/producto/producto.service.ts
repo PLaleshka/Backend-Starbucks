@@ -18,14 +18,6 @@ export class ProductoService {
 
     public async getProducto(id: number): Promise<Producto> {
         try {
-<<<<<<< HEAD
-            const result = await this.productoRepository.createQueryBuilder('producto')
-                .where('producto.id = :id', { id })
-                .getOne();
-
-            if (!result) {
-                throw new Error(`Producto con id ${id} no encontrado`);
-=======
             const result = await this.productoRepository
               .createQueryBuilder('producto')
               .where('producto.idProducto = :id', { id })
@@ -33,15 +25,11 @@ export class ProductoService {
  
             if (!result) {
               throw new Error(`Producto con id ${id} no encontrado`);
->>>>>>> barista-producto
             }
 
             return result;
         } catch (error: any) {
-<<<<<<< HEAD
-=======
             console.error('ERROR EN getProducto:', error.message);
->>>>>>> barista-producto
             throw new Error(error);
         }
     }

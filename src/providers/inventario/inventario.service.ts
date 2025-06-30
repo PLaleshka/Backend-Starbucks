@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { Inventario } from 'src/controllers/database/entities/inventario.entity';
-import { Tienda } from 'src/controllers/database/entities/tienda.entity';
+import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
 import { Ingrediente } from 'src/controllers/database/entities/ingrediente.entity';
 import { IPutInventarioRequest } from 'src/controllers/inventario/dto/IPutInventarioRequest';
 
@@ -12,8 +12,8 @@ export class InventarioService {
     @InjectRepository(Inventario)
     private readonly repo: Repository<Inventario>,
 
-    @InjectRepository(Tienda)
-    private readonly tiendaRepo: Repository<Tienda>,
+    @InjectRepository(TiendaEntity)
+    private readonly tiendaRepo: Repository<TiendaEntity>,
 
     @InjectRepository(Ingrediente)
     private readonly ingredienteRepo: Repository<Ingrediente>,

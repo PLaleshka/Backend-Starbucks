@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { Stock } from 'src/controllers/database/entities/stock.entity';
 import { Producto } from 'src/controllers/database/entities/producto.entity';
-import { Tienda } from 'src/controllers/database/entities/tienda.entity';
+import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
 import { IPutStockRequest } from 'src/controllers/stock/dto/IPutStockRequest';
 
 @Injectable()
@@ -12,8 +12,8 @@ export class StockService {
     @InjectRepository(Stock)
     private readonly stockRepo: Repository<Stock>,
 
-    @InjectRepository(Tienda)
-    private readonly tiendaRepo: Repository<Tienda>,
+    @InjectRepository(TiendaEntity)
+    private readonly tiendaRepo: Repository<TiendaEntity>,
 
     @InjectRepository(Producto)
     private readonly productoRepo: Repository<Producto>

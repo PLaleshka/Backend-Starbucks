@@ -30,9 +30,10 @@ export class PedidoController {
                 apellido: 'Pérez',
                 numeroCelular: '+56912345699',
                 correoElectronico: 'juan.perez@example.com',
-                contraseña: 'juanPassword', 
-                pedidos: [], 
-              },
+                contraseña: 'juanPassword',
+                pedidos: [],
+                numeroCelular: ''
+            },
         },
         {
             idPedido: 2,
@@ -50,7 +51,8 @@ export class PedidoController {
                 correoElectronico: 'maria.gonzalez@example.com',
                 contraseña: 'mariaPassword',
                 pedidos: [],
-              }
+                numeroCelular: ''
+            }
               ,
         },
         {
@@ -69,7 +71,8 @@ export class PedidoController {
                 correoElectronico: 'carlos.ramirez@example.com',
                 contraseña: 'carlosPassword',
                 pedidos: [],
-              }
+                numeroCelular: ''
+            }
               ,
         },
     ];

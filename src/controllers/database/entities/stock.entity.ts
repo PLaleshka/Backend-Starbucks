@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
 } from 'typeorm';
-import { Tienda } from './tienda.entity';
+import { TiendaEntity } from './tienda.entity';
 import { Producto } from './producto.entity';
 
 @Entity({ name: 'stock' })
@@ -16,9 +16,9 @@ export class Stock {
   @Column()
   cantidad!: number;
 
-  @ManyToOne(() => Tienda, tienda => tienda.stocks, { eager: true })
+  @ManyToOne(() => TiendaEntity, tienda => tienda.stocks, { eager: true })
   @JoinColumn({ name: 'id_tienda' })
-  tienda!: Tienda;
+  tienda!: TiendaEntity;
 
   @ManyToOne(() => Producto, producto => producto.stocks, { eager: true })
   @JoinColumn({ name: 'id_producto' })

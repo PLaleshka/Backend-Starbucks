@@ -2,7 +2,7 @@ import { Injectable, HttpException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Cliente } from "src/controllers/database/entities/cliente.entity";
 import { Repository } from "typeorm";
-import { hash, compare} from "bcrypt";
+import { hash, compare} from "bcry";
 import { RegisterRequestDTO } from "src/controllers/login/dto/register-request.dto";
 import { LoginRequestDTO } from "src/controllers/login/dto/login-request.dto";
 import { RegisterResponseDTO } from "src/controllers/login/dto/register-response.dto";

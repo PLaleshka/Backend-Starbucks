@@ -1,15 +1,7 @@
-import { IsDateString, IsNotEmpty, IsNumber, IsString, IsPositive, IsOptional } from 'class-validator';
-import { FindOperator } from 'typeorm';
+import { IsNotEmpty, IsNumber, IsString, IsPositive, IsOptional } from 'class-validator';
 
 export class PedidoDTO {
     @IsNotEmpty()
-<<<<<<< HEAD
-    @IsDateString()
-    fecha!: Date;
-
-    @IsNotEmpty()
-=======
->>>>>>> barista-producto
     @IsNumber()
     @IsPositive()
     subtotal!: number;

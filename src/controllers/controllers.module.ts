@@ -22,19 +22,33 @@ import { TiendaService } from 'src/providers/tienda/tienda.service';
 import { BaristaService } from 'src/providers/barista/barista.service';
 import { ProductoService } from 'src/providers/producto/producto.service';
 import { DetallePedidoService } from 'src/providers/detalle-pedido/detalle-pedido.service';
+import { Ingrediente } from './database/entities/ingrediente.entity';
+import { Inventario } from './database/entities/inventario.entity';
+import { Receta } from './database/entities/receta.entity';
+import { Stock } from './database/entities/stock.entity';
+import { IngredienteController } from './ingrediente/ingrediente.controller';
+import { InventarioController } from './inventario/inventario.controller';
+import { RecetaController } from './receta/receta.controller';
+import { StockController } from './stock/stock.controller';
+import { IngredienteService } from 'src/providers/ingrediente/ingrediente.service';
+import { InventarioService } from 'src/providers/inventario/inventario.service';
+import { RecetaService } from 'src/providers/receta/receta.service';
+import { StockService } from 'src/providers/stock/stock.service';
 
 @Module({
   imports: [
     //DatabaseModule
     TypeOrmModule.forFeature([Cliente, Pedido, AdministradorEntity, TiendaEntity, Barista,
-      Producto, DetallePedido
+      Producto, DetallePedido, Ingrediente, Inventario, Receta, Stock
     ])  
   ],
   controllers: [ClienteController, PedidoController, AdministradorController,
-    TiendaController, BaristaController, ProductoController, DetallePedidoController
+    TiendaController, BaristaController, ProductoController, DetallePedidoController, 
+    IngredienteController, InventarioController, RecetaController, StockController
   ],
   providers: [ClienteService, PedidoService, AdministradorService,
-    TiendaService, BaristaService, ProductoService, DetallePedidoService
+    TiendaService, BaristaService, ProductoService, DetallePedidoService,
+    IngredienteService, InventarioService, RecetaService, StockService
   ],
 })
 export class ControllersModule {}
