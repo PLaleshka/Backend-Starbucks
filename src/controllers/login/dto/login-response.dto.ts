@@ -1,3 +1,4 @@
 export class LoginResponseDTO {
-    status!: string;
+  status!: string;
+  access_token!: string;
 }

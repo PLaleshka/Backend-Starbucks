@@ -39,11 +39,20 @@ import { StockController } from './controllers/stock/stock.controller';
 import { StockService } from './providers/stock/stock.service';
 import { LoginController } from './controllers/login/login.controller';
 import { LoginService } from './providers/login/login.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '3600s' },
+      }),
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -54,23 +63,30 @@ import { LoginService } from './providers/login/login.service';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
-        entities: [Cliente, Pedido, AdministradorEntity, TiendaEntity, Producto, Barista, DetallePedido],
+        entities: [
+          Cliente, Pedido, AdministradorEntity, TiendaEntity, Producto,
+          Barista, DetallePedido, Ingrediente, Inventario, Receta, Stock
+        ],
         synchronize: true,
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Cliente, Pedido, AdministradorEntity, TiendaEntity, Producto, Barista, DetallePedido, 
-      Ingrediente, Inventario, Receta, Stock]),
+    TypeOrmModule.forFeature([
+      Cliente, Pedido, AdministradorEntity, TiendaEntity, Producto,
+      Barista, DetallePedido, Ingrediente, Inventario, Receta, Stock
+    ]),
     ControllersModule,
   ],
-  controllers: [AppController, ClienteController, PedidoController, TiendaController, AdministradorController,
-    ProductoController, BaristaController, DetallePedidoController, LoginController, IngredienteController, InventarioController,
-    RecetaController, StockController
+  controllers: [
+    AppController, ClienteController, PedidoController, TiendaController, AdministradorController,
+    ProductoController, BaristaController, DetallePedidoController, LoginController,
+    IngredienteController, InventarioController, RecetaController, StockController
   ],
-  providers: [AppService, ClienteService, PedidoService, AdministradorService, TiendaService, 
-    ProductoService, BaristaService, DetallePedidoService, LoginService, IngredienteService, InventarioService,
-    RecetaService, StockService
+  providers: [
+    AppService, ClienteService, PedidoService, AdministradorService, TiendaService,
+    ProductoService, BaristaService, DetallePedidoService, LoginService,
+    IngredienteService, InventarioService, RecetaService, StockService
   ],
 })
 export class AppModule {}

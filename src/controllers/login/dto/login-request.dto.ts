@@ -2,7 +2,6 @@ import {
     IsEmail,
     IsNotEmpty,
     IsString,
-    IsStrongPassword
 } from 'class-validator';
 
 export class LoginRequestDTO {
@@ -13,6 +12,5 @@ export class LoginRequestDTO {
 
     @IsNotEmpty()
     @IsString()
-    @IsStrongPassword()
     contraseña!: string;
 }   

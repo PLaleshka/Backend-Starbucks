@@ -18,4 +18,6 @@ export class LoginController {
     public async register(@Body() request: RegisterRequestDTO): Promise<any> {
         return this.loginService.register(request);
     }
+
+
 }

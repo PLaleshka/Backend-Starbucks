@@ -32,7 +32,6 @@ export class PedidoController {
                 correoElectronico: 'juan.perez@example.com',
                 contraseña: 'juanPassword',
                 pedidos: [],
-                numeroCelular: ''
             },
         },
         {
@@ -51,7 +50,6 @@ export class PedidoController {
                 correoElectronico: 'maria.gonzalez@example.com',
                 contraseña: 'mariaPassword',
                 pedidos: [],
-                numeroCelular: ''
             }
               ,
         },
@@ -71,7 +69,6 @@ export class PedidoController {
                 correoElectronico: 'carlos.ramirez@example.com',
                 contraseña: 'carlosPassword',
                 pedidos: [],
-                numeroCelular: ''
             }
               ,
         },
