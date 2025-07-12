@@ -3,13 +3,10 @@ import { DatabaseModule } from './database/database.module';
 import { ClienteService } from 'src/providers/cliente/cliente.service';
 import { PedidoService } from 'src/providers/pedido/pedido.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Cliente } from 'src/controllers/database/entities/cliente.entity';
 import { Pedido } from 'src/controllers/database/entities/pedido.entity';
 import { PedidoController } from 'src/controllers/pedido/pedido.controller';
 import { ClienteController } from 'src/controllers/usuario/cliente.controller';
-import { AdministradorEntity } from './database/entities/administrador.entity';
 import { TiendaEntity } from './database/entities/tienda.entity';
-import { Barista } from './database/entities/barista.entity';
 import { Producto } from './database/entities/producto.entity';
 import { DetallePedido } from './database/entities/detalle-pedido.entity';
 import { AdministradorController } from './administrador/administrador.controller';
@@ -34,11 +31,12 @@ import { IngredienteService } from 'src/providers/ingrediente/ingrediente.servic
 import { InventarioService } from 'src/providers/inventario/inventario.service';
 import { RecetaService } from 'src/providers/receta/receta.service';
 import { StockService } from 'src/providers/stock/stock.service';
+import { Usuario } from './database/entities/usuario.entity';
 
 @Module({
   imports: [
     //DatabaseModule
-    TypeOrmModule.forFeature([Cliente, Pedido, AdministradorEntity, TiendaEntity, Barista,
+    TypeOrmModule.forFeature([Usuario, Pedido, TiendaEntity,
       Producto, DetallePedido, Ingrediente, Inventario, Receta, Stock
     ])  
   ],
