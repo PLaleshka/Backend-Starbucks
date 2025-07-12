@@ -6,6 +6,7 @@ import { ClienteService } from 'src/providers/cliente/cliente.service';
 import { UsuarioUpdateDTO } from './dto/UsuarioUpdateDTO';
 import { UpdateResult } from 'typeorm';
 import { UsuarioDTO } from './dto/usuario.dto';
+import { Usuario } from '../database/entities/usuario.entity';
 
 
 @Controller('cliente')
@@ -71,7 +72,7 @@ export class ClienteController {
         };
 
         if (request) {
-            const newCliente: Cliente = new Cliente()
+            const newCliente: Usuario = new Usuario()
             Object.assign(newCliente, request);
 
             await this.clienteService.create(newCliente);
