@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { Cliente } from 'src/controllers/database/entities/cliente.entity';
-import { ClienteUpdateDTO } from 'src/controllers/cliente/dto/ClienteUpdateDTO';
+import { ClienteUpdateDTO } from 'src/controllers/usuario/dto/UsuarioUpdateDTO';
 
 @Injectable()
 export class ClienteService {

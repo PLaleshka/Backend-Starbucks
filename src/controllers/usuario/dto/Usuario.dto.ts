@@ -1,23 +1,23 @@
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
-export class ClienteUpdateDTO {
-    @IsOptional()
+export class UsuarioDTO {
+    @IsNotEmpty()
     @IsString()
     nombre!: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     apellido!: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     numeroCelular!: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsEmail()
     correoElectronico!: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     @MinLength(6)
     contraseña!: string;

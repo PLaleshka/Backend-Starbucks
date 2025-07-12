@@ -2,37 +2,40 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColum
 import { Pedido } from './pedido.entity';
 import { Inventario } from './inventario.entity';
 import { Stock } from './stock.entity';
-import { AdministradorEntity } from './administrador.entity';
+import { Usuario } from './usuario.entity';
 
 @Entity({ name: 'tienda' })
 export class TiendaEntity {
-    @PrimaryGeneratedColumn()
-    idTienda!: number;
+  @PrimaryGeneratedColumn()
+  idTienda!: number;
 
-    @Column()
-    nombreTienda!: string;
+  @Column()
+  nombreTienda!: string;
 
-    @Column()
-    horario!: string;
+  @Column()
+  horario!: string;
 
-    @Column()
-    ubicacion!: string;
+  @Column()
+  ubicacion!: string;
 
-    @Column()
-    capacidad!: number;
+  @Column()
+  capacidad!: number;
 
-    @Column()
-    disponibilidad!: string;
+  @Column()
+  disponibilidad!: string;
 
-    @Column()
-    correoElectronico!: string;
+  @Column()
+  correoElectronico!: string;
 
-    @Column()
-    contraseña!: string;
+  @Column()
+  contraseña!: string;
 
-    @ManyToOne(() => AdministradorEntity, administrador => administrador.tiendas, { nullable: true })
-    @JoinColumn({ name: 'id_administrador' }) // <- este cambio es crucial
-    administrador!: AdministradorEntity;
+  @ManyToOne(() => Usuario, usuario => usuario.tiendasAdministradas, { nullable: true })
+  @JoinColumn({ name: 'id_usuario_administrador' })
+  administrador!: Usuario;
+
+  @OneToMany(() => Usuario, usuario => usuario.tiendaTrabajo)
+  baristas?: Usuario[];
 
   @OneToMany(() => Pedido, pedido => pedido.tienda)
   pedidos!: Pedido[];
@@ -41,5 +44,5 @@ export class TiendaEntity {
   inventarios!: Inventario[];
 
   @OneToMany(() => Stock, stock => stock.tienda)
-stocks!: Stock[];
+  stocks!: Stock[];
 }

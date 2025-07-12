@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ControllersModule } from './controllers/controllers.module';
-import { ClienteController } from './controllers/cliente/cliente.controller';
+import { ClienteController } from './controllers/usuario/cliente.controller';
 import { PedidoController } from './controllers/pedido/pedido.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';

@@ -1,4 +1,4 @@
-export interface IPutClienteRequest {
+export interface IPutUsuarioRequest {
     nombre?: string;
     apellido?: string;
     numeroCelular?: string;

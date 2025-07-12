@@ -1,18 +1,16 @@
 import { Body, Controller, Get, Param, Post, Put, Res, Delete } from '@nestjs/common';
-import { IPostClienteRequest } from './dto/IPostClienteRequest';
-import { IPostClienteResponse } from './dto/IPostClienteResponse';
-import { IGetClienteResponse } from './dto/IGetClienteResponse';
+import { IPostUsuarioResponse } from './dto/IPostUsuarioResponse';
+import { IGetUsuarioResponse } from './dto/IGetUsuarioResponse';
 import { Response } from 'express';
 import { ClienteService } from 'src/providers/cliente/cliente.service';
-import { ClienteDTO } from './dto/cliente.dto';
-import { Cliente } from 'src/controllers/database/entities/cliente.entity';
-import { ClienteUpdateDTO } from './dto/ClienteUpdateDTO';
+import { UsuarioUpdateDTO } from './dto/UsuarioUpdateDTO';
 import { UpdateResult } from 'typeorm';
+import { UsuarioDTO } from './dto/usuario.dto';
 
 
 @Controller('cliente')
 export class ClienteController {
-    private clientes: IGetClienteResponse[] = [
+    private clientes: IGetUsuarioResponse[] = [
         {
             idCliente: 1,
             nombre: 'Juan',
@@ -34,7 +32,7 @@ export class ClienteController {
     constructor(private clienteService: ClienteService) {}
 
     @Get()
-    public async getClientes(): Promise<IGetClienteResponse[]> {
+    public async getClientes(): Promise<IGetUsuarioResponse[]> {
         // Usar el servicio para obtener los clientes desde la base de datos
         const clientes = await this.clienteService.getAllClientes();
 
@@ -51,7 +49,7 @@ export class ClienteController {
 
 
     @Get(':id')
-    public getCliente(@Param('id') id: number): IGetClienteResponse {
+    public getCliente(@Param('id') id: number): IGetUsuarioResponse {
         const cliente = this.clientes.find(
             c => c.idCliente === Number(id)
         );
@@ -63,9 +61,9 @@ export class ClienteController {
 
     @Post()
     async postCliente(
-        @Body() request: ClienteDTO
-    ): Promise<IPostClienteResponse> {
-        const response: IPostClienteResponse = {
+        @Body() request: UsuarioDTO
+    ): Promise<IPostUsuarioResponse> {
+        const response: IPostUsuarioResponse = {
             data: null,
             statusCode: 200, 
             statusDescription: 'Cliente creado correctamente',
@@ -91,7 +89,7 @@ export class ClienteController {
     @Put(':id')
     async putCliente(
         @Param('id') id: number,
-        @Body() request: ClienteUpdateDTO
+        @Body() request: UsuarioUpdateDTO
     ): Promise<UpdateResult | undefined> {
 
         return await this.clienteService.update(id, request);

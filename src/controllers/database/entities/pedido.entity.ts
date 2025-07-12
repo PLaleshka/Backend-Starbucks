@@ -2,10 +2,9 @@ import {
     Entity, PrimaryGeneratedColumn, Column, CreateDateColumn,
     ManyToOne, OneToMany, JoinColumn
   } from 'typeorm';
-  import { Cliente } from './cliente.entity';
-  import { Barista } from './barista.entity';
   import { TiendaEntity } from './tienda.entity';
   import { DetallePedido } from './detalle-pedido.entity';
+import { Usuario } from './usuario.entity';
   
   @Entity({ name: 'pedido' })
   export class Pedido {
@@ -27,13 +26,13 @@ import {
     @Column({ name: 'estado_pedido' })
     estadoPedido!: string;
   
-    @ManyToOne(() => Cliente, cliente => cliente.pedidos, { eager: true })
-    @JoinColumn({ name: 'id_cliente' })
-    cliente!: Cliente;
-  
-    @ManyToOne(() => Barista, barista => barista.pedidos, { nullable: true, eager: true })
-    @JoinColumn({ name: 'id_barista' })
-    barista?: Barista;
+    @ManyToOne(() => Usuario, usuario => usuario.pedidos, { eager: true })
+    @JoinColumn({ name: 'id_usuario_cliente' })
+    cliente!: Usuario;
+
+    @ManyToOne(() => Usuario, usuario => usuario.pedidosAtendidos, { nullable: true, eager: true })
+    @JoinColumn({ name: 'id_usuario_barista' })
+    barista?: Usuario;
   
     @ManyToOne(() => TiendaEntity, tienda => tienda.pedidos, { eager: true })
     @JoinColumn({ name: 'id_tienda' })
@@ -41,5 +40,6 @@ import {
   
     @OneToMany(() => DetallePedido, dp => dp.pedido, { cascade: true, eager: true })
     detallePedidos!: DetallePedido[];
+    usuario: any;
   }
   

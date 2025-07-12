@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cliente } from 'src/controllers/database/entities/cliente.entity';
 import { Pedido } from 'src/controllers/database/entities/pedido.entity';
 import { PedidoController } from 'src/controllers/pedido/pedido.controller';
-import { ClienteController } from 'src/controllers/cliente/cliente.controller';
+import { ClienteController } from 'src/controllers/usuario/cliente.controller';
 import { AdministradorEntity } from './database/entities/administrador.entity';
 import { TiendaEntity } from './database/entities/tienda.entity';
 import { Barista } from './database/entities/barista.entity';

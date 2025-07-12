@@ -1,4 +1,4 @@
-export interface IPostClienteResponse {
+export interface IPostUsuarioResponse {
     data:any;
     statusCode: number;
     statusDescription: string;

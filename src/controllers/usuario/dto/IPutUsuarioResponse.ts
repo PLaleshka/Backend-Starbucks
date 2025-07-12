@@ -1,4 +1,4 @@
-export interface IPutClienteResponse {
+export interface IPutUsuarioResponse {
     data: null;
     statusCode: number;
     statusDescription: string;
