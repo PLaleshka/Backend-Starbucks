@@ -1,6 +1,6 @@
 import { Injectable, HttpException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Cliente } from "src/controllers/database/entities/cliente.entity";
+import { Usuario } from "src/controllers/database/entities/usuario.entity";
 import { Repository } from "typeorm";
 import { hash, compare } from "bcrypt";
 import { RegisterRequestDTO } from "src/controllers/login/dto/register-request.dto";
@@ -12,8 +12,8 @@ import { JwtService } from "@nestjs/jwt";
 @Injectable()
 export class LoginService {
   constructor(
-    @InjectRepository(Cliente)
-    private readonly clienteRepository: Repository<Cliente>,
+    @InjectRepository(Usuario)
+    private readonly clienteRepository: Repository<Usuario>,
     private readonly jwtService: JwtService // <-- NUEVO
   ) {}
 
@@ -23,9 +23,9 @@ export class LoginService {
 
     request = { ...request, contraseña: encryptedPassword };
 
-    const cliente: Cliente = new Cliente();
+    const cliente: Usuario = new Usuario();
     Object.assign(cliente, request);
-    const result: Cliente = this.clienteRepository.create(cliente);
+    const result: Usuario = this.clienteRepository.create(cliente);
 
     await this.clienteRepository.save(result);
 
@@ -53,7 +53,7 @@ export class LoginService {
 
       // Generar el JWT:
       const payload = {
-        sub: result.idCliente,
+        sub: result.idUsuario,
         email: result.correoElectronico,
       };
 

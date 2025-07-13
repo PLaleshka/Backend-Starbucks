@@ -1,62 +1,64 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
 import { Repository } from 'typeorm';
-import { AdministradorService } from '../administrador/administrador.service';
+import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
+import { Usuario } from 'src/controllers/database/entities/usuario.entity';
 
 @Injectable()
 export class TiendaService {
     constructor(
-        @InjectRepository(TiendaEntity) 
+        @InjectRepository(TiendaEntity)
         private readonly tiendaRepository: Repository<TiendaEntity>,
-        private readonly administradorService: AdministradorService,
-        ){}
+
+        @InjectRepository(Usuario)
+        private readonly usuarioRepository: Repository<Usuario>,
+    ) {}
 
     public async getAllTiendas(): Promise<TiendaEntity[]> {
-        const tiendas = await this.tiendaRepository.find({
-            relations: ['administrador'],
+        return await this.tiendaRepository.find({
+        relations: ['administrador'],
         });
-        return tiendas;
     }
 
-    public async updateTienda(id: number, tiendaData: Partial<TiendaEntity>): Promise<TiendaEntity | null> {
+    public async updateTienda(
+        id: number,
+        tiendaData: Partial<TiendaEntity>,
+    ): Promise<TiendaEntity | null> {
         const tienda = await this.tiendaRepository.findOne({
-            where: { idTienda: id },
-            relations: ['administrador'],  // Aseguramos que cargue la relación del administrador
+        where: { idTienda: id },
+        relations: ['administrador'],
         });
 
         if (!tienda) {
-            return null;
+        return null;
         }
 
-        // Si hay un idAdministrador en el request, buscar al administrador
-        if (tiendaData.administrador && tiendaData.administrador.id) {
-            const administrador = await this.administradorService.getUserById(tiendaData.administrador.id);
+        if (
+        tiendaData.administrador &&
+        tiendaData.administrador.idUsuario
+        ) {
+        const administrador = await this.usuarioRepository.findOneBy({
+            idUsuario: tiendaData.administrador.idUsuario,
+        });
 
-            if (!administrador) {
-                throw new Error('Administrador no encontrado');
-            }
-
-            // Asignar el administrador a la tienda
-            tienda.administrador = administrador;
+        if (!administrador || administrador.rol !== 'administrador') {
+            throw new Error('Administrador no encontrado o rol inválido');
         }
 
-        // Actualizar otros campos
+        tienda.administrador = administrador;
+        }
+
         const updatedTienda = Object.assign(tienda, tiendaData);
-
-        // Guardar tienda actualizada
         return await this.tiendaRepository.save(updatedTienda);
     }
-    
-    public async create(tienda: TiendaEntity): Promise<TiendaEntity> {
-        const result  = this.tiendaRepository.create(tienda);
 
-        return await this.tiendaRepository.save(result);
+    public async create(tienda: TiendaEntity): Promise<TiendaEntity> {
+        const nuevaTienda = this.tiendaRepository.create(tienda);
+        return await this.tiendaRepository.save(nuevaTienda);
     }
 
     public async delete(id: number): Promise<boolean> {
         const result = await this.tiendaRepository.delete(id);
-        return (result.affected ?? 0) > 0;  // Retorna true si se eliminó, de lo contrario false
+        return (result.affected ?? 0) > 0;
     }
-
 }

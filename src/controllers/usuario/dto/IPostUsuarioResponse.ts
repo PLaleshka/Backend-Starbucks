@@ -1,6 +1,6 @@
 export interface IPostUsuarioResponse {
-    data:any;
+    data: any;
     statusCode: number;
     statusDescription: string;
-    errors: string[] | null; // Solo para casos de error
+    errors: string[] | null;
 }

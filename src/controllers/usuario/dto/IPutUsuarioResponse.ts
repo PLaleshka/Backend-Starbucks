@@ -1,6 +1,6 @@
 export interface IPutUsuarioResponse {
-    data: null;
+    data: any;
     statusCode: number;
     statusDescription: string;
-    errors: string[] | null
+    errors: string[] | null;
 }

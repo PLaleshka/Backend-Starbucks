@@ -2,26 +2,18 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ControllersModule } from './controllers/controllers.module';
-import { ClienteController } from './controllers/usuario/cliente.controller';
 import { PedidoController } from './controllers/pedido/pedido.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Cliente } from './controllers/database/entities/cliente.entity';
 import { Pedido } from './controllers/database/entities/pedido.entity';
-import { ClienteService } from './providers/cliente/cliente.service';
+import { UsuarioService } from './providers/usuario/usuario.service';
 import { PedidoService } from './providers/pedido/pedido.service';
 import { TiendaService } from './providers/tienda/tienda.service';
-import { AdministradorService } from './providers/administrador/administrador.service';
-import { AdministradorEntity } from './controllers/database/entities/administrador.entity';
 import { TiendaEntity } from './controllers/database/entities/tienda.entity';
 import { TiendaController } from './controllers/tienda/tienda.controller';
-import { AdministradorController } from './controllers/administrador/administrador.controller';
 import { Producto } from './controllers/database/entities/producto.entity';
 import { ProductoController } from './controllers/producto/producto.controller';
 import { ProductoService } from './providers/producto/producto.service';
-import { Barista } from './controllers/database/entities/barista.entity';
-import { BaristaController } from './controllers/barista/barista.controller';
-import { BaristaService } from './providers/barista/barista.service';
 import { DetallePedidoController } from './controllers/detalle-pedido/detalle-pedido.controller';
 import { DetallePedidoService } from './providers/detalle-pedido/detalle-pedido.service';
 import { DetallePedido } from './controllers/database/entities/detalle-pedido.entity';
@@ -40,6 +32,8 @@ import { StockService } from './providers/stock/stock.service';
 import { LoginController } from './controllers/login/login.controller';
 import { LoginService } from './providers/login/login.service';
 import { JwtModule } from '@nestjs/jwt';
+import { Usuario } from './controllers/database/entities/usuario.entity';
+import { UsuarioController } from './controllers/usuario/usuario.controller';
 
 @Module({
   imports: [
@@ -64,8 +58,7 @@ import { JwtModule } from '@nestjs/jwt';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         entities: [
-          Cliente, Pedido, AdministradorEntity, TiendaEntity, Producto,
-          Barista, DetallePedido, Ingrediente, Inventario, Receta, Stock
+          Usuario, Pedido, TiendaEntity, Producto, DetallePedido, Ingrediente, Inventario, Receta, Stock
         ],
         synchronize: true,
         autoLoadEntities: true,
@@ -73,19 +66,19 @@ import { JwtModule } from '@nestjs/jwt';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([
-      Cliente, Pedido, AdministradorEntity, TiendaEntity, Producto,
-      Barista, DetallePedido, Ingrediente, Inventario, Receta, Stock
+      Usuario, Pedido, TiendaEntity, Producto,
+      DetallePedido, Ingrediente, Inventario, Receta, Stock
     ]),
     ControllersModule,
   ],
   controllers: [
-    AppController, ClienteController, PedidoController, TiendaController, AdministradorController,
-    ProductoController, BaristaController, DetallePedidoController, LoginController,
+    AppController, UsuarioController, PedidoController, TiendaController,
+    ProductoController, DetallePedidoController, LoginController,
     IngredienteController, InventarioController, RecetaController, StockController
   ],
   providers: [
-    AppService, ClienteService, PedidoService, AdministradorService, TiendaService,
-    ProductoService, BaristaService, DetallePedidoService, LoginService,
+    AppService, UsuarioService, PedidoService, TiendaService,
+    ProductoService, DetallePedidoService, LoginService,
     IngredienteService, InventarioService, RecetaService, StockService
   ],
 })

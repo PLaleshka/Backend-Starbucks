@@ -27,7 +27,7 @@ export class IPostTiendaRequest {
   contraseña!: string;
 
   // Validación para asegurarnos de que idAdministrador no es opcional y puede ser nulo
-  @IsNotEmpty()
+  @IsOptional()
   @IsInt()
   idAdministrador!: number | null;
 }

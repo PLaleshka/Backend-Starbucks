@@ -1,24 +1,32 @@
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UsuarioUpdateDTO {
     @IsOptional()
     @IsString()
-    nombre!: string;
+    nombre?: string;
 
     @IsOptional()
     @IsString()
-    apellido!: string;
-
-    @IsOptional()
-    @IsString()
-    numeroCelular!: string;
+    apellido?: string;
 
     @IsOptional()
     @IsEmail()
-    correoElectronico!: string;
+    correoElectronico?: string;
 
     @IsOptional()
     @IsString()
     @MinLength(6)
-    contraseña!: string;
+    contraseña?: string;
+
+    @IsOptional()
+    @IsEnum(['cliente', 'barista', 'administrador'])
+    rol?: 'cliente' | 'barista' | 'administrador';
+
+    @IsOptional()
+    @IsString()
+    numeroCelular?: string;
+
+    @IsOptional()
+    @IsString()
+    telefono?: string;
 }

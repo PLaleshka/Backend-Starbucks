@@ -16,62 +16,7 @@ import { PedidoResponseDTO } from './dto/PedidoResponseDTO';
 @Controller('Pedido') 
 export class PedidoController {
     private pedidos: IGetPedidoResponse[] = [
-        {
-            idPedido: 1,
-            fecha: new Date(),
-            subtotal: 100,
-            iva: 19,
-            total: 119,
-            tiempoEstimado: '30 minutos',
-            estadoPedido: 'En preparación',
-            cliente: {
-                idCliente: 1,
-                nombre: 'Juan',
-                apellido: 'Pérez',
-                numeroCelular: '+56912345699',
-                correoElectronico: 'juan.perez@example.com',
-                contraseña: 'juanPassword',
-                pedidos: [],
-            },
-        },
-        {
-            idPedido: 2,
-            fecha: new Date(),
-            subtotal: 200,
-            iva: 38,
-            total: 238,
-            tiempoEstimado: '45 minutos',
-            estadoPedido: 'En camino',
-            cliente: {
-                idCliente: 2,
-                nombre: 'María',
-                apellido: 'González',
-                numeroCelular: '+56987654321',
-                correoElectronico: 'maria.gonzalez@example.com',
-                contraseña: 'mariaPassword',
-                pedidos: [],
-            }
-              ,
-        },
-        {
-            idPedido: 3,
-            fecha: new Date(),
-            subtotal: 300,
-            iva: 57,
-            total: 357,
-            tiempoEstimado: '60 minutos',
-            estadoPedido: 'Entregado',
-            cliente: {
-                idCliente: 3,
-                nombre: 'Carlos',
-                apellido: 'Ramírez',
-                numeroCelular: '+56912345678',
-                correoElectronico: 'carlos.ramirez@example.com',
-                contraseña: 'carlosPassword',
-                pedidos: [],
-            }
-              ,
-        },
+
     ];
 
     constructor(private pedidoService: PedidoService) {}

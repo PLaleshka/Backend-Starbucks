@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UsuarioDTO {
     @IsNotEmpty()
@@ -10,10 +10,6 @@ export class UsuarioDTO {
     apellido!: string;
 
     @IsNotEmpty()
-    @IsString()
-    numeroCelular!: string;
-
-    @IsNotEmpty()
     @IsEmail()
     correoElectronico!: string;
 
@@ -21,4 +17,16 @@ export class UsuarioDTO {
     @IsString()
     @MinLength(6)
     contraseña!: string;
+
+    @IsNotEmpty()
+    @IsEnum(['cliente', 'barista', 'administrador'])
+    rol!: 'cliente' | 'barista' | 'administrador';
+
+    @IsOptional()
+    @IsString()
+    numeroCelular?: string;
+
+    @IsOptional()
+    @IsString()
+    telefono?: string;
 }

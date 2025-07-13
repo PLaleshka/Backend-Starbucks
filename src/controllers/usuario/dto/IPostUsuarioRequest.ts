@@ -1,8 +1,9 @@
 export interface IPostUsuarioRequest {
     nombre: string;
     apellido: string;
-    numeroCelular: string;
     correoElectronico: string;
     contraseña: string;
-    
+    rol: 'cliente' | 'barista' | 'administrador';
+    numeroCelular?: string;
+    telefono?: string;
 }
