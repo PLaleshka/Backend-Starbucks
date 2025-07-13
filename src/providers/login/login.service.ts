@@ -1,72 +1,82 @@
-import { Injectable, HttpException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Usuario } from "src/controllers/database/entities/usuario.entity";
-import { Repository } from "typeorm";
-import { hash, compare } from "bcrypt";
-import { RegisterRequestDTO } from "src/controllers/login/dto/register-request.dto";
-import { LoginRequestDTO } from "src/controllers/login/dto/login-request.dto";
-import { RegisterResponseDTO } from "src/controllers/login/dto/register-response.dto";
-import { LoginResponseDTO } from "src/controllers/login/dto/login-response.dto";
-import { JwtService } from "@nestjs/jwt";
+import { Injectable, HttpException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { hash, compare } from 'bcrypt';
+
+import { Usuario } from 'src/controllers/database/entities/usuario.entity';
+import { RegisterRequestDTO } from 'src/controllers/login/dto/register-request.dto';
+import { RegisterWithRoleDTO } from 'src/controllers/login/dto/register-with-role.dto';
+import { LoginRequestDTO } from 'src/controllers/login/dto/login-request.dto';
+import { RegisterResponseDTO } from 'src/controllers/login/dto/register-response.dto';
+import { LoginResponseDTO } from 'src/controllers/login/dto/login-response.dto';
 
 @Injectable()
 export class LoginService {
   constructor(
     @InjectRepository(Usuario)
-    private readonly clienteRepository: Repository<Usuario>,
-    private readonly jwtService: JwtService // <-- NUEVO
+    private readonly usuarioRepository: Repository<Usuario>,
+    private readonly jwtService: JwtService,
   ) {}
 
-  public async register(request: RegisterRequestDTO): Promise<RegisterResponseDTO> {
-    const { contraseña } = request;
-    const encryptedPassword = await hash(contraseña, 10);
+  // Registro con rol por defecto (cliente)
+  public async register(
+    request: RegisterRequestDTO,
+  ): Promise<RegisterResponseDTO> {
+    const encryptedPassword = await hash(request.contraseña, 10);
 
-    request = { ...request, contraseña: encryptedPassword };
+    const usuario = new Usuario();
+    Object.assign(usuario, request);
+    usuario.contraseña = encryptedPassword;
+    usuario.rol = 'cliente';
 
-    const cliente: Usuario = new Usuario();
-    Object.assign(cliente, request);
-    const result: Usuario = this.clienteRepository.create(cliente);
+    await this.usuarioRepository.save(usuario);
 
-    await this.clienteRepository.save(result);
-
-    const response: RegisterResponseDTO = {
-      status: "Cliente registrado"
-    };
-
-    return response;
+    return { status: 'Cliente registrado correctamente' };
   }
 
-  public async validate(credentials: LoginRequestDTO): Promise<LoginResponseDTO> {
-    try {
-      const { correoElectronico, contraseña } = credentials;
-      const result = await this.clienteRepository.findOneBy({ correoElectronico });
+  // Registro con rol explícito (barista o administrador)
+  public async registerWithRole(
+    request: RegisterWithRoleDTO,
+  ): Promise<RegisterResponseDTO> {
+    const encryptedPassword = await hash(request.contraseña, 10);
 
-      if (!result) {
-        throw new HttpException("Cliente no encontrado", 404);
-      }
+    const usuario = new Usuario();
+    Object.assign(usuario, request);
+    usuario.contraseña = encryptedPassword;
 
-      const checkPassword: boolean = await compare(contraseña, result.contraseña);
+    await this.usuarioRepository.save(usuario);
 
-      if (!checkPassword) {
-        throw new HttpException("Contraseña incorrecta", 403); // ← corregido
-      }
+    return { status: `Usuario registrado como ${usuario.rol}` };
+  }
 
-      // Generar el JWT:
-      const payload = {
-        sub: result.idUsuario,
-        email: result.correoElectronico,
-      };
+  // Validación de credenciales y generación de JWT
+  public async validate(
+    credentials: LoginRequestDTO,
+  ): Promise<LoginResponseDTO> {
+    const { correoElectronico, contraseña } = credentials;
 
-      const token = this.jwtService.sign(payload);
-
-      const response: LoginResponseDTO = {
-        status: "Cliente autenticado",
-        access_token: token
-      };
-
-      return response;
-    } catch (error: any) {
-      throw new Error(error);
+    const usuario = await this.usuarioRepository.findOneBy({ correoElectronico });
+    if (!usuario) {
+      throw new HttpException('Usuario no encontrado', 404);
     }
+
+    const passwordValid = await compare(contraseña, usuario.contraseña);
+    if (!passwordValid) {
+      throw new HttpException('Contraseña incorrecta', 403);
+    }
+
+    const payload = {
+      sub: usuario.idUsuario,
+      email: usuario.correoElectronico,
+      rol: usuario.rol,
+    };
+
+    const token = this.jwtService.sign(payload);
+
+    return {
+      status: 'Usuario autenticado correctamente',
+      access_token: token,
+    };
   }
 }

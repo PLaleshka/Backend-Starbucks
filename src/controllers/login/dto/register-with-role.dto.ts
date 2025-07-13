@@ -2,10 +2,11 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  IsStrongPassword
+  IsStrongPassword,
+  IsIn
 } from 'class-validator';
 
-export class RegisterRequestDTO {
+export class RegisterWithRoleDTO {
     @IsNotEmpty()
     @IsString()
     nombre!: string;
@@ -31,4 +32,8 @@ export class RegisterRequestDTO {
         minSymbols: 0,
     })
     contraseña!: string;
+
+    @IsNotEmpty()
+    @IsIn(['cliente', 'barista', 'administrador'])
+    rol!: 'cliente' | 'barista' | 'administrador';
 }
