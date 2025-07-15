@@ -9,11 +9,12 @@ import { Inventario } from './entities/inventario.entity';
 import { Stock } from './entities/stock.entity';
 import { Receta } from './entities/receta.entity';
 import { Usuario } from './entities/usuario.entity';
+import { Cupon } from './entities/cupon.entity';
 
 @Module({
     imports: [
       TypeOrmModule.forFeature([Usuario, Pedido, TiendaEntity, Producto,
-        DetallePedido, Ingrediente, Inventario, Stock, Receta
+        DetallePedido, Ingrediente, Inventario, Stock, Receta, Cupon
       ]),
     ],
     exports: [

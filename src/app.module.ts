@@ -34,6 +34,9 @@ import { LoginService } from './providers/login/login.service';
 import { JwtModule } from '@nestjs/jwt';
 import { Usuario } from './controllers/database/entities/usuario.entity';
 import { UsuarioController } from './controllers/usuario/usuario.controller';
+import { Cupon } from './controllers/database/entities/cupon.entity';
+import { CuponController } from './controllers/cupon/cupon.controller';
+import { CuponService } from './providers/cupon/cupon.service';
 
 @Module({
   imports: [
@@ -58,7 +61,8 @@ import { UsuarioController } from './controllers/usuario/usuario.controller';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         entities: [
-          Usuario, Pedido, TiendaEntity, Producto, DetallePedido, Ingrediente, Inventario, Receta, Stock
+          Usuario, Pedido, TiendaEntity, Producto, DetallePedido, Ingrediente, Inventario, 
+          Receta, Stock, Cupon
         ],
         synchronize: true,
         autoLoadEntities: true,
@@ -67,19 +71,20 @@ import { UsuarioController } from './controllers/usuario/usuario.controller';
     }),
     TypeOrmModule.forFeature([
       Usuario, Pedido, TiendaEntity, Producto,
-      DetallePedido, Ingrediente, Inventario, Receta, Stock
+      DetallePedido, Ingrediente, Inventario, Receta, Stock, Cupon
     ]),
     ControllersModule,
   ],
   controllers: [
     AppController, UsuarioController, PedidoController, TiendaController,
     ProductoController, DetallePedidoController, LoginController,
-    IngredienteController, InventarioController, RecetaController, StockController
+    IngredienteController, InventarioController, RecetaController, StockController,
+    CuponController
   ],
   providers: [
     AppService, UsuarioService, PedidoService, TiendaService,
     ProductoService, DetallePedidoService, LoginService,
-    IngredienteService, InventarioService, RecetaService, StockService
+    IngredienteService, InventarioService, RecetaService, StockService, CuponService
   ],
 })
 export class AppModule {}

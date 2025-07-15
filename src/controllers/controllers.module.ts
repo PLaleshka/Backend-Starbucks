@@ -28,21 +28,25 @@ import { RecetaService } from 'src/providers/receta/receta.service';
 import { StockService } from 'src/providers/stock/stock.service';
 import { Usuario } from './database/entities/usuario.entity';
 import { UsuarioController } from './usuario/usuario.controller';
+import { Cupon } from './database/entities/cupon.entity';
+import { CuponController } from './cupon/cupon.controller';
+import { CuponService } from 'src/providers/cupon/cupon.service';
 
 @Module({
   imports: [
     //DatabaseModule
     TypeOrmModule.forFeature([Usuario, Pedido, TiendaEntity,
-      Producto, DetallePedido, Ingrediente, Inventario, Receta, Stock
+      Producto, DetallePedido, Ingrediente, Inventario, Receta, Stock, Cupon
     ])  
   ],
   controllers: [UsuarioController, PedidoController,
     TiendaController, ProductoController, DetallePedidoController, 
-    IngredienteController, InventarioController, RecetaController, StockController
+    IngredienteController, InventarioController, RecetaController, StockController,
+    CuponController
   ],
   providers: [UsuarioService, PedidoService,
     TiendaService, ProductoService, DetallePedidoService,
-    IngredienteService, InventarioService, RecetaService, StockService
+    IngredienteService, InventarioService, RecetaService, StockService, CuponService
   ],
 })
 export class ControllersModule {}

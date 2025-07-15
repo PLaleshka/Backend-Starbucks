@@ -6,6 +6,9 @@ import { PedidoUpdateDTO } from 'src/controllers/pedido/dto/PedidoUpdateDTO';
 import { PedidoDTO } from 'src/controllers/pedido/dto/pedido.dto';
 import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
 import { Usuario } from 'src/controllers/database/entities/usuario.entity';
+import { DetallePedido } from 'src/controllers/database/entities/detalle-pedido.entity';
+import { Producto } from 'src/controllers/database/entities/producto.entity';
+import { Cupon } from 'src/controllers/database/entities/cupon.entity';
 
 @Injectable()
 export class PedidoService {
@@ -18,6 +21,15 @@ export class PedidoService {
 
     @InjectRepository(TiendaEntity)
     private readonly tiendaRepository: Repository<TiendaEntity>,
+
+    @InjectRepository(DetallePedido)
+    private readonly detalleRepository: Repository<DetallePedido>,
+
+    @InjectRepository(Producto)
+    private readonly productoRepository: Repository<Producto>,
+
+    @InjectRepository(Cupon)
+    private readonly cuponRepository: Repository<Cupon>,
   ) {}
 
   public async getAllPedidos(): Promise<Pedido[]> {
@@ -64,7 +76,47 @@ export class PedidoService {
     pedido.tienda = tienda;
     if (barista) pedido.barista = barista;
 
-    return await this.pedidoRepository.save(pedido);
+    const savedPedido = await this.pedidoRepository.save(pedido);
+
+    // Generar cupones personalizados si aplica
+    if (pedidoDto.productos && pedidoDto.productos.length > 0) {
+      for (const idProducto of pedidoDto.productos) {
+        const producto = await this.productoRepository.findOneBy({ idProducto });
+        if (producto) {
+          await this.generarCuponSiAplica(cliente, producto);
+        }
+      }
+    }
+
+    return savedPedido;
+  }
+
+  private async generarCuponSiAplica(usuario: Usuario, producto: Producto) {
+    const codigo = `PROMO-${producto.nombre.toUpperCase().replace(/\s+/g, '')}-${usuario.idUsuario}`;
+
+    const existente = await this.cuponRepository.findOne({ where: { codigo } });
+    if (existente) return;
+
+    const detalles = await this.detalleRepository.find({
+      where: {
+        pedido: { usuario: { idUsuario: usuario.idUsuario } },
+        producto: { idProducto: producto.idProducto }
+      },
+      relations: ['pedido', 'producto'],
+    });
+
+    if (detalles.length >= 3) {
+      const cupon = this.cuponRepository.create({
+        codigo,
+        descripcion: `50% de descuento en tu bebida favorita: ${producto.nombre}`,
+        descuento: 50,
+        personalizado: true,
+        producto,
+        usuario,
+      });
+
+      await this.cuponRepository.save(cupon);
+    }
   }
 
   public async update(id: number, pedidoDto: PedidoUpdateDTO): Promise<UpdateResult | undefined> {

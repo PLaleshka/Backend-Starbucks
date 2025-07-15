@@ -38,5 +38,8 @@ export class PedidoDTO {
     @IsNumber()
     @IsPositive()
     barista?: number;
+
+    @IsOptional()
+    productos?: number[];
 }
 

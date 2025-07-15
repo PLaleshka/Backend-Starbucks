@@ -6,7 +6,7 @@ import { Usuario } from './usuario.entity';
 
 @Entity({ name: 'tienda' })
 export class TiendaEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_tienda' })
   idTienda!: number;
 
   @Column()
