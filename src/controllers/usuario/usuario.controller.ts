@@ -1,0 +1,132 @@
+import {Body,Controller,Delete,Get,Param,Post,Put} from '@nestjs/common';
+import { UsuarioService } from 'src/providers/usuario/usuario.service';
+import { UsuarioDTO } from './dto/Usuario.dto';
+import { UsuarioUpdateDTO } from './dto/UsuarioUpdateDTO';
+import { IGetUsuarioResponse } from './dto/IGetUsuarioResponse';
+import { IPostUsuarioResponse } from './dto/IPostUsuarioResponse';
+import { IPutUsuarioResponse } from './dto/IPutUsuarioResponse';
+import { Usuario } from '../database/entities/usuario.entity';
+import { UpdateResult } from 'typeorm';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam
+} from '@nestjs/swagger';
+
+@ApiTags('Usuario')
+@Controller('usuario')
+export class UsuarioController {
+  constructor(private readonly usuarioService: UsuarioService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Obtener todos los usuarios' })
+  @ApiResponse({ status: 200, description: 'Lista de usuarios', type: [Usuario] })
+  public async getUsuarios(): Promise<IGetUsuarioResponse[]> {
+    const usuarios = await this.usuarioService.getAllUsuarios();
+
+    return usuarios.map((usuario) => ({
+      idUsuario: usuario.idUsuario,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      numeroCelular: usuario.numeroCelular ?? '',
+      correoElectronico: usuario.correoElectronico,
+      contraseña: usuario.contraseña,
+      rol: usuario.rol
+    }));
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtener un usuario por ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Usuario encontrado', type: Usuario })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+  public async getUsuario(@Param('id') id: number): Promise<IGetUsuarioResponse> {
+    const usuario = await this.usuarioService.getUsuarioById(id);
+
+    if (!usuario) {
+      throw new Error(`Usuario con id ${id} no encontrado`);
+    }
+
+    return {
+      idUsuario: usuario.idUsuario,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      numeroCelular: usuario.numeroCelular ?? '',
+      correoElectronico: usuario.correoElectronico,
+      contraseña: usuario.contraseña,
+      rol: usuario.rol
+    };
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Crear nuevo usuario' })
+  @ApiBody({ type: UsuarioDTO })
+  @ApiResponse({ status: 200, description: 'Usuario creado correctamente' })
+  async postUsuario(@Body() request: UsuarioDTO): Promise<IPostUsuarioResponse> {
+    const usuario = new Usuario();
+    Object.assign(usuario, request);
+
+    await this.usuarioService.create(usuario);
+
+    return {
+      data: null,
+      statusCode: 200,
+      statusDescription: 'Usuario creado correctamente',
+      errors: null
+    };
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Actualizar usuario por ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiBody({ type: UsuarioUpdateDTO })
+  @ApiResponse({ status: 200, description: 'Usuario actualizado correctamente' })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+  async putUsuario(
+    @Param('id') id: number,
+    @Body() request: UsuarioUpdateDTO
+  ): Promise<IPutUsuarioResponse> {
+    const result: UpdateResult | undefined = await this.usuarioService.update(id, request);
+
+    if (!result || result.affected === 0) {
+      return {
+        data: null,
+        statusCode: 404,
+        statusDescription: 'Usuario no encontrado',
+        errors: ['No se pudo actualizar el usuario']
+      };
+    }
+
+    return {
+      data: null,
+      statusCode: 200,
+      statusDescription: 'Usuario actualizado correctamente',
+      errors: null
+    };
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar usuario por ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Usuario eliminado correctamente' })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+  async deleteUsuario(@Param('id') id: number): Promise<any> {
+    const isDeleted = await this.usuarioService.delete(id);
+
+    if (!isDeleted) {
+      return {
+        statusCode: 404,
+        statusDescription: 'Usuario no encontrado o no se pudo eliminar',
+        errors: null
+      };
+    }
+
+    return {
+      statusCode: 200,
+      statusDescription: 'Usuario eliminado correctamente',
+      errors: null
+    };
+  }
+}
