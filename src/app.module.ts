@@ -62,6 +62,8 @@ import { UsuarioController } from './controllers/usuario/usuario.controller';
         ],
         synchronize: true,
         autoLoadEntities: true,
+        logging: true,
+        timezone: 'local',
       }),
       inject: [ConfigService],
     }),
