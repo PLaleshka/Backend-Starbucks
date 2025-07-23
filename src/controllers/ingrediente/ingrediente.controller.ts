@@ -1,28 +1,16 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  NotFoundException,
-} from '@nestjs/common';
+import {Body,Controller,Delete,Get,Param,Post,Put,NotFoundException,UseGuards} from '@nestjs/common';
 import { IngredienteService } from 'src/providers/ingrediente/ingrediente.service';
 import { Ingrediente } from 'src/controllers/database/entities/ingrediente.entity';
 import { IPostIngredienteRequest } from './dto/IPostIngredienteRequest';
 import { IPostIngredienteResponse } from './dto/IPostIngredienteResponse';
 import { IPutIngredienteRequest } from './dto/IputIngredienteRequest';
 import { IPutIngredienteResponse } from './dto/IPutIngredienteResponse';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBody,
-  ApiParam,
-} from '@nestjs/swagger';
+import {ApiTags,ApiOperation,ApiResponse,ApiBody,ApiParam,ApiBearerAuth} from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/controllers/auth/jwt-auth.guard';
 
 @ApiTags('Ingrediente')
+@ApiBearerAuth() 
+@UseGuards(JwtAuthGuard)
 @Controller('ingrediente')
 export class IngredienteController {
   constructor(private readonly ingredienteService: IngredienteService) {}
@@ -57,7 +45,11 @@ export class IngredienteController {
   @ApiResponse({
     status: 201,
     description: 'Ingrediente creado correctamente',
-    type: Ingrediente, // Replace with a class, e.g., Ingrediente or a DTO class
+    type: Ingrediente,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Solicitud inválida',
   })
   async create(
     @Body() request: IPostIngredienteRequest,

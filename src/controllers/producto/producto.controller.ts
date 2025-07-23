@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Put, Delete, NotFoundException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Delete,
+  NotFoundException,
+  UseGuards,
+} from '@nestjs/common';
 import { ProductoService } from 'src/providers/producto/producto.service';
 import { ProductoDTO } from './dto/producto.dto';
 import { ProductoUpdateDTO } from './dto/ProductoUpdateDTO';
@@ -10,16 +20,24 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/controllers/auth/jwt-auth.guard';
 
 @ApiTags('Producto')
+@ApiBearerAuth() // Swagger muestra que se requiere token
+@UseGuards(JwtAuthGuard) // Protege todas las rutas
 @Controller('producto')
 export class ProductoController {
   constructor(private productoService: ProductoService) {}
 
   @Get()
   @ApiOperation({ summary: 'Obtener todos los productos' })
-  @ApiResponse({ status: 200, description: 'Lista de productos', type: [Producto] })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de productos',
+    type: [Producto],
+  })
   async getProductos(): Promise<Producto[]> {
     return await this.productoService.getAllProductos();
   }
@@ -27,7 +45,11 @@ export class ProductoController {
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un producto por ID' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Producto encontrado', type: Producto })
+  @ApiResponse({
+    status: 200,
+    description: 'Producto encontrado',
+    type: Producto,
+  })
   @ApiResponse({ status: 404, description: 'Producto no encontrado' })
   async getProducto(@Param('id') id: number): Promise<Producto> {
     const producto = await this.productoService.getProducto(id);
@@ -40,7 +62,11 @@ export class ProductoController {
   @Post()
   @ApiOperation({ summary: 'Crear un nuevo producto' })
   @ApiBody({ type: ProductoDTO })
-  @ApiResponse({ status: 201, description: 'Producto creado correctamente' })
+  @ApiResponse({
+    status: 201,
+    description: 'Producto creado correctamente',
+    type: Producto,
+  })
   @ApiResponse({ status: 400, description: 'Solicitud inválida' })
   async postProducto(@Body() request: ProductoDTO) {
     if (request) {

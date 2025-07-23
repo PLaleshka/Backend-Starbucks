@@ -18,7 +18,7 @@ export class PedidoDTO {
   @IsOptional()
   @IsNumber()
   @IsPositive()
-  total!: number;
+  total?: number; // ✅ ahora sí es realmente opcional
 
   @ApiProperty({ description: 'Tiempo estimado de preparación', example: '15 minutos' })
   @IsNotEmpty()

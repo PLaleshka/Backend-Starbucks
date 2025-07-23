@@ -1,28 +1,16 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  NotFoundException,
-} from '@nestjs/common';
+import {Body,Controller,Delete,Get,Param,Post,Put,NotFoundException,UseGuards} from '@nestjs/common';
 import { InventarioService } from 'src/providers/inventario/inventario.service';
 import { IPostInventarioRequest } from './dto/IPostInventarioRequest';
 import { IPostInventarioResponse } from './dto/IPostInventarioResponse';
 import { Inventario } from 'src/controllers/database/entities/inventario.entity';
 import { IPutInventarioRequest } from './dto/IPutInventarioRequest';
 import { UpdateResult } from 'typeorm';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiBody,
-} from '@nestjs/swagger';
+import {ApiTags,ApiOperation,ApiResponse,ApiParam,ApiBody,ApiBearerAuth} from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/controllers/auth/jwt-auth.guard';
 
 @ApiTags('Inventario')
+@ApiBearerAuth() // Swagger muestra el botón "Authorize"
+@UseGuards(JwtAuthGuard) // Protege todas las rutas del controlador
 @Controller('inventario')
 export class InventarioController {
   constructor(private readonly inventarioService: InventarioService) {}
@@ -81,11 +69,16 @@ export class InventarioController {
     description: 'Inventario actualizado correctamente',
     type: UpdateResult,
   })
+  @ApiResponse({ status: 404, description: 'Inventario no encontrado' })
   async update(
     @Param('id') id: number,
     @Body() body: IPutInventarioRequest,
   ): Promise<UpdateResult> {
-    return await this.inventarioService.update(id, body);
+    const result = await this.inventarioService.update(id, body);
+    if (!result.affected) {
+      throw new NotFoundException('Inventario no encontrado');
+    }
+    return result;
   }
 
   @Delete(':id')
@@ -95,7 +88,9 @@ export class InventarioController {
     status: 200,
     description: 'Inventario eliminado correctamente',
   })
-  async delete(@Param('id') id: number): Promise<{ message: string }> {
+  @ApiResponse({})
+  async delete(@Param('id') id: number): 
+  Promise<{ message: string }> {
     await this.inventarioService.delete(id);
     return { message: `Inventario con id ${id} eliminado correctamente` };
   }

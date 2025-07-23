@@ -16,23 +16,20 @@ import {
   ApiBody,
   ApiParam,
 } from '@nestjs/swagger';
-import { IPedidoResponse as IGetPedidoResponse } from './dto/IGetPedidoResponse';
-import { IPostPedidoRequest } from './dto/IPostPedidoRequest';
-import { IPostPedidoResponse } from './dto/IPostPedidoResponse';
-import { IPutPedidoRequest } from './dto/IPutPedidoRequest';
 import { Response } from 'express';
+import { plainToInstance } from 'class-transformer';
+
 import { PedidoService } from 'src/providers/pedido/pedido.service';
 import { PedidoDTO } from './dto/pedido.dto';
-import { Pedido } from 'src/controllers/database/entities/pedido.entity';
-import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult';
 import { PedidoUpdateDTO } from './dto/PedidoUpdateDTO';
-import { plainToInstance } from 'class-transformer';
 import { PedidoResponseDTO } from './dto/PedidoResponseDTO';
+import { IPedidoResponse } from './dto/IGetPedidoResponse';
+import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult';
 
 @ApiTags('Pedido')
-@Controller('Pedido')
+@Controller('pedido')
 export class PedidoController {
-  private pedidos: IGetPedidoResponse[] = [];
+  private pedidos: IPedidoResponse[] = [];
 
   constructor(private pedidoService: PedidoService) {}
 
@@ -43,7 +40,7 @@ export class PedidoController {
     description: 'Lista de pedidos en memoria',
     type: [PedidoResponseDTO],
   })
-  public getpedidos(): IGetPedidoResponse[] {
+  public getpedidos(): IPedidoResponse[] {
     return this.pedidos;
   }
 
@@ -56,7 +53,7 @@ export class PedidoController {
     type: PedidoResponseDTO,
   })
   @ApiResponse({ status: 404, description: 'Pedido no encontrado' })
-  public getpedido(@Param('id') id: number): IGetPedidoResponse {
+  public getpedido(@Param('id') id: number): IPedidoResponse {
     const pedido = this.pedidos.find((c) => c.idPedido === Number(id));
     if (!pedido) {
       throw new NotFoundException(`Pedido con id ${Number(id)} no encontrado`);
@@ -72,9 +69,13 @@ export class PedidoController {
     description: 'Pedido creado exitosamente',
     type: PedidoResponseDTO,
   })
-  async createPedido(@Body() pedidoDto: PedidoDTO): Promise<PedidoResponseDTO> {
+  async createPedido(
+    @Body() pedidoDto: PedidoDTO,
+  ): Promise<PedidoResponseDTO> {
     const pedido = await this.pedidoService.create(pedidoDto);
-    return plainToInstance(PedidoResponseDTO, pedido, { excludeExtraneousValues: true });
+    return plainToInstance(PedidoResponseDTO, pedido, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Put(':id')
@@ -86,6 +87,7 @@ export class PedidoController {
     description: 'Pedido actualizado exitosamente',
     type: UpdateResult,
   })
+  @ApiResponse({ status: 404, description: 'Pedido no encontrado' })
   async putpedido(
     @Param('id') id: number,
     @Body() request: PedidoUpdateDTO,
@@ -99,19 +101,24 @@ export class PedidoController {
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Pedido eliminado correctamente' })
   @ApiResponse({ status: 404, description: 'Pedido no encontrado' })
-  async deletepedido(@Param('id') id: number, @Res() response: Response): Promise<Response> {
+  async deletepedido(
+    @Param('id') id: number,
+    @Res() response: Response,
+  ): Promise<Response> {
     if (isNaN(id)) return response.status(400).send();
 
     let isPedidoFound = false;
     this.pedidos = this.pedidos.filter((pedido) => {
       if (pedido.idPedido === id) {
         isPedidoFound = true;
-        return false; // remove
+        return false;
       }
       return true;
     });
 
-    if (!isPedidoFound) return response.status(404).send();
+    if (!isPedidoFound) {
+      return response.status(404).send();
+    }
 
     return response.status(200).send({ message: 'Pedido eliminado correctamente' });
   }
