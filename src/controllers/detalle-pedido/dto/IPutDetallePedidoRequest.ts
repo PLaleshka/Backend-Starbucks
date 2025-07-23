@@ -1,5 +1,6 @@
 import { IsInt, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class IPutDetallePedidoRequest {
   @ApiPropertyOptional({

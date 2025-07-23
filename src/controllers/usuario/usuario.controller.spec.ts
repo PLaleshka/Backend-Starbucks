@@ -1,19 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsuarioController } from './usuario.controller';
-import { UsuarioService } from 'src/providers/usuario/usuario.service';
 
-describe('UsuarioController', () => {
+describe('ClienteController', () => {
   let controller: UsuarioController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsuarioController],
-      providers: [
-        {
-          provide: UsuarioService,
-          useValue: {}, // aquí puedes mockear funciones si quieres
-        },
-      ],
     }).compile();
 
     controller = module.get<UsuarioController>(UsuarioController);

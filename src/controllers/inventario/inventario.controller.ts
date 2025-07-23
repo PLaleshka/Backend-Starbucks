@@ -79,6 +79,7 @@ export class InventarioController {
       throw new NotFoundException('Inventario no encontrado');
     }
     return result;
+  async update(@Param('id') id: number, @Body() body: IPutInventarioRequest): Promise<UpdateResult> {
   }
 
   @Delete(':id')
@@ -91,6 +92,7 @@ export class InventarioController {
   @ApiResponse({})
   async delete(@Param('id') id: number): 
   Promise<{ message: string }> {
+  async delete(@Param('id') id: number): Promise<{ message: string }> {
     await this.inventarioService.delete(id);
     return { message: `Inventario con id ${id} eliminado correctamente` };
   }

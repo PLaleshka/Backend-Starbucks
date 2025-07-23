@@ -1,5 +1,12 @@
 import { IsInt, Min, IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsInt,
+  Min,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class IPostDetallePedidoRequest {
   @ApiProperty({
