@@ -5,42 +5,19 @@ import { IPostDetallePedidoResponse } from './dto/IPostDetallePedidoResponse';
 import { DetallePedido } from 'src/controllers/database/entities/detalle-pedido.entity';
 import { UpdateResult } from 'typeorm';
 import { IPutDetallePedidoRequest } from './dto/IPutDetallePedidoRequest';
-import {ApiTags,ApiOperation,ApiResponse,ApiParam,ApiBody,ApiBearerAuth} from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/controllers/auth/jwt-auth.guard';
-import { UseGuards } from '@nestjs/common';
 
-@ApiTags('DetallePedido')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('detalle-pedido')
 export class DetallePedidoController {
   constructor(private readonly detalleService: DetallePedidoService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obtener todos los detalles de pedido' })
-  @ApiResponse({
-    status: 200,
-    description: 'Lista de detalles de pedido',
-    type: [DetallePedido],
-  })
   async getAll(): Promise<DetallePedido[]> {
     return await this.detalleService.getAll();
   }
 
   @Post()
-  @ApiOperation({ summary: 'Crear un nuevo detalle de pedido' })
-  @ApiBody({ type: IPostDetallePedidoRequest })
-  @ApiResponse({
-    status: 201,
-    description: 'Detalle de pedido creado correctamente',
-    type: DetallePedido, // Usa una clase que pueda ser reflejada por Swagger
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Error al crear detalle de pedido',
-  })
   async postDetalle(
-    @Body() request: IPostDetallePedidoRequest,
+    @Body() request: IPostDetallePedidoRequest
   ): Promise<IPostDetallePedidoResponse> {
     const response: IPostDetallePedidoResponse = {
       data: null,
@@ -62,33 +39,14 @@ export class DetallePedidoController {
   }
 
   @Delete(':idPedido/:idProducto')
-  @ApiOperation({
-    summary: 'Eliminar un detalle de pedido por idPedido y idProducto',
-  })
-  @ApiParam({ name: 'idPedido', type: Number })
-  @ApiParam({ name: 'idProducto', type: Number })
-  @ApiResponse({ status: 200, description: 'Detalle eliminado correctamente' })
-  @ApiResponse({ status: 404, description: 'Detalle no encontrado' })
   async deleteDetalle(
     @Param('idPedido') idPedido: string,
-    @Param('idProducto') idProducto: string,
+    @Param('idProducto') idProducto: string
   ): Promise<void> {
     await this.detalleService.delete(+idPedido, +idProducto);
   }
 
   @Put(':idPedido/:idProducto')
-  @ApiOperation({
-    summary: 'Actualizar un detalle de pedido por idPedido y idProducto',
-  })
-  @ApiParam({ name: 'idPedido', type: Number })
-  @ApiParam({ name: 'idProducto', type: Number })
-  @ApiBody({ type: IPutDetallePedidoRequest })
-  @ApiResponse({
-    status: 200,
-    description: 'Detalle actualizado correctamente',
-    type: UpdateResult,
-  })
-  @ApiResponse({ status: 404, description: 'Detalle no encontrado' })
   async updateDetalle(
     @Param('idPedido') idPedido: string,
     @Param('idProducto') idProducto: string,
