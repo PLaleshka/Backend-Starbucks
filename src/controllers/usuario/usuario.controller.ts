@@ -1,4 +1,4 @@
-import {Body,Controller,Delete,Get,Param,Post,Put} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { UsuarioService } from 'src/providers/usuario/usuario.service';
 import { UsuarioDTO } from './dto/Usuario.dto';
 import { UsuarioUpdateDTO } from './dto/UsuarioUpdateDTO';
@@ -23,7 +23,7 @@ export class UsuarioController {
       numeroCelular: usuario.numeroCelular ?? '',
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
-      rol: usuario.rol
+      rol: usuario.rol,
     }));
   }
 
@@ -42,7 +42,7 @@ export class UsuarioController {
       numeroCelular: usuario.numeroCelular ?? '',
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
-      rol: usuario.rol
+      rol: usuario.rol,
     };
   }
 
@@ -57,50 +57,45 @@ export class UsuarioController {
       data: null,
       statusCode: 200,
       statusDescription: 'Usuario creado correctamente',
-      errors: null
+      errors: []
+
     };
   }
 
   @Put(':id')
-  async putUsuario(
-    @Param('id') id: number,
-    @Body() request: UsuarioUpdateDTO
-  ): Promise<IPutUsuarioResponse> {
+  async putUsuario(@Param('id') id: number, @Body() request: UsuarioUpdateDTO): Promise<IPutUsuarioResponse> {
     const result: UpdateResult | undefined = await this.usuarioService.update(id, request);
 
-    if (!result || result.affected === 0) {
-      return {
-        data: null,
-        statusCode: 404,
-        statusDescription: 'Usuario no encontrado',
-        errors: ['No se pudo actualizar el usuario']
-      };
+    if (!result) {
+      throw new Error(`No se encontró usuario con id ${id} para actualizar`);
     }
 
     return {
       data: null,
       statusCode: 200,
       statusDescription: 'Usuario actualizado correctamente',
-      errors: null
+      errors: []
+
     };
   }
 
   @Delete(':id')
-  async deleteUsuario(@Param('id') id: number): Promise<any> {
-    const isDeleted = await this.usuarioService.delete(id);
+  async deleteUsuario(@Param('id') id: number): Promise<boolean> {
+    return this.usuarioService.delete(id);
+  }
 
-    if (!isDeleted) {
-      return {
-        statusCode: 404,
-        statusDescription: 'Usuario no encontrado o no se pudo eliminar',
-        errors: null
-      };
+  // ✅ NUEVO: LOGIN
+  @Post('login')
+  async login(
+    @Body() datos: { correoElectronico: string; contraseña: string }
+  ): Promise<Omit<Usuario, 'contraseña'>> {
+    const usuario = await this.usuarioService.login(datos.correoElectronico, datos.contraseña);
+
+    if (!usuario) {
+      throw new Error('Correo o contraseña incorrectos');
     }
 
-    return {
-      statusCode: 200,
-      statusDescription: 'Usuario eliminado correctamente',
-      errors: null
-    };
+    const { contraseña, ...usuarioSinContraseña } = usuario;
+    return usuarioSinContraseña;
   }
 }

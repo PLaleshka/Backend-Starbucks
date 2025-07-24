@@ -41,9 +41,6 @@ export class Usuario {
   tiendasAdministradas?: TiendaEntity[];
 
   // BARISTA: tienda donde trabaja (solo una tienda por barista)
-  @Column({ name: 'id_tienda', nullable: true })
-  idTienda?: number;
-
   @ManyToOne(() => TiendaEntity, tienda => tienda.baristas)
   @JoinColumn({ name: 'id_tienda' })
   tiendaTrabajo?: TiendaEntity;
