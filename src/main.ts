@@ -19,7 +19,7 @@ async function bootstrap() {
   );
 
   // Prefijo global opcional
-  ////setGlobalPrefix('api'); // puedes quitarlo si no lo usas
+  app.setGlobalPrefix('api');
 
   await app.listen(3000);
 }
