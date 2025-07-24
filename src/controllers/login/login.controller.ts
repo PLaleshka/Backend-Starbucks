@@ -13,20 +13,20 @@ import { Roles } from '../auth/roles.decorator';
 export class LoginController {
   constructor(private readonly loginService: LoginService) {}
 
-    @Post('register')
-    async register(@Body() body: RegisterRequestDTO): Promise<RegisterResponseDTO> {
-        return this.loginService.register(body);
-    }
+  @Post('register')
+  async register(@Body() body: RegisterRequestDTO): Promise<RegisterResponseDTO> {
+    return this.loginService.register(body); // ya debe encriptar en el service
+  }
 
-    @Post('register-with-role')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('administrador')
-    async registerWithRole(@Body() body: RegisterWithRoleDTO): Promise<RegisterResponseDTO> {
-        return this.loginService.registerWithRole(body);
-    }
+  @Post('register-with-role')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('administrador')
+  async registerWithRole(@Body() body: RegisterWithRoleDTO): Promise<RegisterResponseDTO> {
+    return this.loginService.registerWithRole(body); // también encripta
+  }
 
-    @Post()
-    async login(@Body() body: LoginRequestDTO): Promise<LoginResponseDTO> {
-        return this.loginService.validate(body);
-    }
+  @Post()
+  async login(@Body() body: LoginRequestDTO): Promise<LoginResponseDTO> {
+    return this.loginService.validate(body); // debe hacer el bcrypt.compare y devolver el token
+  }
 }
