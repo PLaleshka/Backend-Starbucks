@@ -55,7 +55,7 @@ export class UsuarioController {
   @Post()
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
   @ApiBody({ type: UsuarioDTO })
-  @ApiResponse({ status: 201, description: 'Usuario creado correctamente', type: IPostUsuarioResponse })
+  @ApiResponse({ status: 201, description: 'Usuario creado correctamente' })
   async postUsuario(@Body() request: UsuarioDTO): Promise<IPostUsuarioResponse> {
     const usuario = new Usuario();
     Object.assign(usuario, request);
@@ -73,7 +73,7 @@ export class UsuarioController {
   @ApiOperation({ summary: 'Actualizar un usuario por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UsuarioUpdateDTO })
-  @ApiResponse({ status: 200, description: 'Usuario actualizado correctamente', type: IPutUsuarioResponse })
+  @ApiResponse({ status: 200, description: 'Usuario actualizado correctamente' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   async putUsuario(@Param('id') id: number, @Body() request: UsuarioUpdateDTO): Promise<IPutUsuarioResponse> {
     const result: UpdateResult | undefined = await this.usuarioService.update(id, request);
