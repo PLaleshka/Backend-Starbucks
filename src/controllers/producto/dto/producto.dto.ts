@@ -33,4 +33,12 @@ export class ProductoDTO {
   @IsString()
   @IsOptional()
   descripcion?: string;
+
+  @ApiPropertyOptional({
+    example: 'https://miapp.com/images/latte.png',
+    description: 'URL de la imagen del producto',
+  })
+  @IsString()
+  @IsOptional()
+  imagen?: string;
 }

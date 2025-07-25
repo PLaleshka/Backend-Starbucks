@@ -31,6 +31,12 @@ export class ProductoResponseDTO {
   })
   descripcion?: string;
 
+  @ApiPropertyOptional({
+    example: 'https://miapp.com/images/latte.png',
+    description: 'URL de la imagen del producto',
+  })
+  imagen?: string;
+
   @ApiProperty({
     example: '2025-07-16T12:34:56Z',
     description: 'Fecha de creación del producto',

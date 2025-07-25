@@ -17,6 +17,10 @@ export class Producto {
   @Column({ nullable: true })
   descripcion!: string;
 
+  //imagen 
+  @Column({ type: 'text', nullable: true })
+  imagen?: string;
+
   @Column()
   precio!: number;
 
@@ -27,8 +31,8 @@ export class Producto {
   detallePedidos!: DetallePedido[];
 
   @OneToMany(() => Receta, receta => receta.producto)
-recetas!: Receta[];
+  recetas!: Receta[];
 
-@OneToMany(() => Stock, stock => stock.producto)
-stocks!: Stock[];
+  @OneToMany(() => Stock, stock => stock.producto)
+  stocks!: Stock[];
 }

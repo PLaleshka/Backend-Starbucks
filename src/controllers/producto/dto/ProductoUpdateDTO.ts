@@ -24,7 +24,7 @@ export class ProductoUpdateDTO {
     description: 'Nuevo precio del producto',
   })
   @IsOptional()
-  @Type(() => Number) // Esto asegura que el valor se transforme correctamente
+  @Type(() => Number)
   @IsNumber()
   precio?: number;
 
@@ -35,4 +35,12 @@ export class ProductoUpdateDTO {
   @IsString()
   @IsOptional()
   descripcion?: string;
+
+  @ApiPropertyOptional({
+    example: 'https://miapp.com/images/espresso.png',
+    description: 'Nueva URL de la imagen del producto',
+  })
+  @IsString()
+  @IsOptional()
+  imagen?: string;
 }
