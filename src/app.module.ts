@@ -41,12 +41,12 @@ import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    // 📦 Config .env global
+    // Config .env global
     ConfigModule.forRoot({
       isGlobal: true,
     }),
 
-    // 🔐 JWT
+    // JWT
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -58,7 +58,7 @@ import { JwtModule } from '@nestjs/jwt';
       inject: [ConfigService],
     }),
 
-    // 🗄️ TypeORM config
+    // TypeORM config
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -78,7 +78,7 @@ import { JwtModule } from '@nestjs/jwt';
       inject: [ConfigService],
     }),
 
-    // 📦 Repositorios disponibles para inyección
+    // Repositorios disponibles para inyección
     TypeOrmModule.forFeature([
       Usuario, Pedido, TiendaEntity, Producto,
       DetallePedido, Ingrediente, Inventario, Receta, Stock
