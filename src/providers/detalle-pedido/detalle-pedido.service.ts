@@ -39,11 +39,7 @@ export class DetallePedidoService {
     detalle.idPedido = dto.idPedido;
     detalle.idProducto = dto.idProducto;
     detalle.cantidad = dto.cantidad;
-    detalle.tamano = dto.tamano ?? '';
-    detalle.temperatura = dto.temperatura ?? '';
-    detalle.nivelDulzura = dto.nivelDulzura ?? '';
-    detalle.tipoLeche = dto.tipoLeche ?? '';
-    detalle.extras = dto.extras ?? null;
+    
 
     return await this.detalleRepo.save(detalle);
   }

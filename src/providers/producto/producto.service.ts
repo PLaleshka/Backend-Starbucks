@@ -90,4 +90,11 @@ export class ProductoService {
     public async getAllProductos(): Promise<Producto[]> {
         return await this.productoRepository.find();
     }
+    
+    async getProductoConOpciones(id: number): Promise<Producto | null> {
+    return await this.productoRepository.findOne({
+    where: { idProducto: id },
+    relations: ['productoOpciones', 'productoOpciones.opcion'],
+  });
+}
 }

@@ -16,21 +16,14 @@ export class DetallePedido {
   @Column()
   cantidad!: number;
 
-  @Column()
-  tamano!: string;
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  precioUnitario!: number;
 
-  @Column()
-  temperatura!: string;
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  precioTotal!: number;
 
-  @Column({ name: 'nivel_dulzura' })
-  nivelDulzura!: string;
-
-  @Column({ name: 'tipo_leche' })
-  tipoLeche!: string;
-
-  @Column({ nullable: true, type: 'varchar' })
-  extras!: string | null;
-
+  @Column({ type: 'json', nullable: true })
+  detallePersonalizacion?: any;
 
   @ManyToOne(() => Pedido, pedido => pedido.detallePedidos)
   @JoinColumn({ name: 'id_pedido' })
