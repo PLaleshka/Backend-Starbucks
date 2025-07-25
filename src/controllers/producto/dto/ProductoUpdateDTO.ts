@@ -24,7 +24,7 @@ export class ProductoUpdateDTO {
     description: 'Nuevo precio del producto',
   })
   @IsOptional()
-  @Type(() => Number) // 👈 Esto asegura que el valor se transforme correctamente
+  @Type(() => Number) //Esto asegura que el valor se transforme correctamente
   @IsNumber()
   precio?: number;
 
