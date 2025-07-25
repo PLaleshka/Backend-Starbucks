@@ -1,32 +1,75 @@
-import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+
+// Importa desde donde lo tengas o define nuevamente si es necesario
+export enum RolUsuario {
+  CLIENTE = 'cliente',
+  BARISTA = 'barista',
+  ADMINISTRADOR = 'administrador',
+}
 
 export class UsuarioUpdateDTO {
-    @IsOptional()
-    @IsString()
-    nombre?: string;
+  @ApiPropertyOptional({
+    example: 'Juan',
+    description: 'Nombre del usuario',
+  })
+  @IsOptional()
+  @IsString()
+  nombre?: string;
 
-    @IsOptional()
-    @IsString()
-    apellido?: string;
+  @ApiPropertyOptional({
+    example: 'Pérez',
+    description: 'Apellido del usuario',
+  })
+  @IsOptional()
+  @IsString()
+  apellido?: string;
 
-    @IsOptional()
-    @IsEmail()
-    correoElectronico?: string;
+  @ApiPropertyOptional({
+    example: 'usuario@correo.com',
+    description: 'Correo electrónico del usuario',
+  })
+  @IsOptional()
+  @IsEmail()
+  correoElectronico?: string;
 
-    @IsOptional()
-    @IsString()
-    @MinLength(6)
-    contraseña?: string;
+  @ApiPropertyOptional({
+    example: 'nuevaContraseña123',
+    description: 'Contraseña del usuario (mínimo 6 caracteres)',
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(6)
+  contraseña?: string;
 
-    @IsOptional()
-    @IsEnum(['cliente', 'barista', 'administrador'])
-    rol?: 'cliente' | 'barista' | 'administrador';
+  @ApiPropertyOptional({
+    example: RolUsuario.BARISTA,
+    enum: RolUsuario,
+    description: 'Rol del usuario',
+  })
+  @IsOptional()
+  @IsEnum(RolUsuario)
+  rol?: RolUsuario;
 
-    @IsOptional()
-    @IsString()
-    numeroCelular?: string;
+  @ApiPropertyOptional({
+    example: '987654321',
+    description: 'Número de celular del usuario (opcional)',
+  })
+  @IsOptional()
+  @IsString()
+  numeroCelular?: string;
 
-    @IsOptional()
-    @IsString()
-    telefono?: string;
+  @ApiPropertyOptional({
+    example: '1234567',
+    description: 'Teléfono adicional del usuario (opcional)',
+  })
+  @IsOptional()
+  @IsString()
+  telefono?: string;
 }
