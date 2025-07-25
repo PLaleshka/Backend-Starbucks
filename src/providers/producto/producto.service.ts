@@ -40,6 +40,7 @@ export class ProductoService {
                 categoria: p.categoria,
                 isAvailable: cantidad > 0,
                 stock: cantidad,
+                imagen: p.imagen,
             };
         });
     }

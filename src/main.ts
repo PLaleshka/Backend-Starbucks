@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,8 +22,8 @@ async function bootstrap() {
   );
 
   // Prefijo global opcional
-  ////setGlobalPrefix('api'); // puedes quitarlo si no lo usas
-
+  ////setGlobalPrefix('api'); //
+  app.use('/images', express.static(join(__dirname, '..', 'public', 'images')));
   await app.listen(3000);
 }
 

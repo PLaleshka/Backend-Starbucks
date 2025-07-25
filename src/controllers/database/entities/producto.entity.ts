@@ -22,6 +22,9 @@ export class Producto {
 
   @Column({ name: 'tiempo_base' })
   tiempoBase!: number;
+  
+  @Column({ nullable: true })
+  imagen?: string;
 
   @OneToMany(() => DetallePedido, dp => dp.producto)
   detallePedidos!: DetallePedido[];
