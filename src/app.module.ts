@@ -38,6 +38,12 @@ import { StockService } from './providers/stock/stock.service';
 import { LoginService } from './providers/login/login.service';
 
 import { JwtModule } from '@nestjs/jwt';
+import { ProductoOpcion } from './controllers/database/entities/producto-opcion.entity';
+import { OpcionPersonalizacion } from './controllers/database/entities/opcion-personalizacion.entity';
+import { ProductoOpcionController } from './controllers/producto-opcion/producto-opcion.controller';
+import { OpcionPersonalizacionController } from './controllers/opcion-personalizacion/opcion-personalizacion.controller';
+import { OpcionPersonalizacionService } from './providers/opcion-personalizacion/opcion.personalizacion.service';
+import { ProductoOpcionService } from './providers/producto-opcion/producto-opcion.service';
 
 @Module({
   imports: [
@@ -81,7 +87,8 @@ import { JwtModule } from '@nestjs/jwt';
     // Repositorios disponibles para inyección
     TypeOrmModule.forFeature([
       Usuario, Pedido, TiendaEntity, Producto,
-      DetallePedido, Ingrediente, Inventario, Receta, Stock
+      DetallePedido, Ingrediente, Inventario, Receta, Stock, ProductoOpcion, 
+      OpcionPersonalizacion
     ]),
 
     ControllersModule,
@@ -90,13 +97,15 @@ import { JwtModule } from '@nestjs/jwt';
   controllers: [
     AppController, UsuarioController, PedidoController, TiendaController,
     ProductoController, DetallePedidoController, LoginController,
-    IngredienteController, InventarioController, RecetaController, StockController
+    IngredienteController, InventarioController, RecetaController, StockController,
+    ProductoOpcionController, OpcionPersonalizacionController
   ],
 
   providers: [
     AppService, UsuarioService, PedidoService, TiendaService,
     ProductoService, DetallePedidoService, LoginService,
-    IngredienteService, InventarioService, RecetaService, StockService
+    IngredienteService, InventarioService, RecetaService, StockService,
+    ProductoOpcionService, OpcionPersonalizacionService
   ],
 })
 export class AppModule {}

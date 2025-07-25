@@ -85,5 +85,12 @@ export class ProductoController {
     }
     return { message: `Producto con id ${id} eliminado correctamente` };
   }
+
+    @Get(':id/opciones')
+    async getOpcionesPersonalizacion(@Param('id') id: number) {
+    const producto = await this.productoService.getProductoConOpciones(id);
+    if (!producto) throw new NotFoundException('Producto no encontrado');
+    return producto.productoOpciones.map(po => po.opcion);
+    }
 }
 
