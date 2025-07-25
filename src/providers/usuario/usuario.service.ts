@@ -33,7 +33,7 @@ export class UsuarioService {
   }
 
   public async create(usuario: Usuario): Promise<Usuario> {
-    // 🔐 Encriptar la contraseña antes de guardar
+    // Encriptar la contraseña antes de guardar
     const hashedPassword = await bcrypt.hash(usuario.contraseña, 10);
     const nuevoUsuario = this.usuarioRepository.create({
       ...usuario,
@@ -58,7 +58,7 @@ export class UsuarioService {
     return result.affected !== 0;
   }
 
-  // ✅ Método seguro para login con bcrypt
+  // Método seguro para login con bcrypt
   public async login(correoElectronico: string, contrasena: string): Promise<Usuario | null> {
     const usuario = await this.usuarioRepository.findOne({ where: { correoElectronico } });
 
