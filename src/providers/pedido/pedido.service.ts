@@ -25,9 +25,16 @@ export class PedidoService {
   }
 
   public async findById(id: number): Promise<Pedido | null> {
-    return await this.pedidoRepository.findOne({
-      where: { idPedido: id },
-    });
+    try {
+      const result = await this.pedidoRepository
+        .createQueryBuilder('pedido')
+        .where('pedido.idPedido = :id', { id })
+        .getOne();
+
+      return result ?? null;
+    } catch (error: any) {
+      throw new Error(error);
+    }
   }
 
   public async findByClienteId(idCliente: number): Promise<Pedido[]> {
@@ -48,24 +55,22 @@ export class PedidoService {
     pedido.tiempoEstimado = pedidoDto.tiempoEstimado;
     pedido.estadoPedido = pedidoDto.estadoPedido;
 
-    const cliente = await this.usuarioRepository.findOneBy({
-      idUsuario: pedidoDto.cliente,
-    });
-    if (!cliente || cliente.rol !== 'cliente')
+    const cliente = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.cliente });
+    if (!cliente || cliente.rol !== 'cliente') {
       throw new Error('Cliente no encontrado o rol incorrecto');
+    }
 
-    const tienda = await this.tiendaRepository.findOneBy({
-      idTienda: pedidoDto.tienda,
-    });
-    if (!tienda) throw new Error('Tienda no encontrada');
+    const tienda = await this.tiendaRepository.findOneBy({ idTienda: pedidoDto.tienda });
+    if (!tienda) {
+      throw new Error('Tienda no encontrada');
+    }
 
     let barista: Usuario | null = null;
     if (pedidoDto.barista) {
-      barista = await this.usuarioRepository.findOneBy({
-        idUsuario: pedidoDto.barista,
-      });
-      if (!barista || barista.rol !== 'barista')
+      barista = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.barista });
+      if (!barista || barista.rol !== 'barista') {
         throw new Error('Barista no encontrado o rol incorrecto');
+      }
     }
 
     pedido.usuario = cliente;
@@ -75,10 +80,7 @@ export class PedidoService {
     return await this.pedidoRepository.save(pedido);
   }
 
-  public async update(
-    id: number,
-    pedidoDto: PedidoUpdateDTO,
-  ): Promise<UpdateResult | undefined> {
+  public async update(id: number, pedidoDto: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
     const updateData: Partial<Pedido> = {
       estadoPedido: pedidoDto.estadoPedido,
       subtotal: pedidoDto.subtotal,
@@ -87,11 +89,10 @@ export class PedidoService {
     };
 
     if (pedidoDto.cliente) {
-      const cliente = await this.usuarioRepository.findOneBy({
-        idUsuario: pedidoDto.cliente,
-      });
-      if (!cliente || cliente.rol !== 'cliente')
+      const cliente = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.cliente });
+      if (!cliente || cliente.rol !== 'cliente') {
         throw new Error('Cliente no encontrado o rol incorrecto');
+      }
       updateData.usuario = cliente;
     }
 

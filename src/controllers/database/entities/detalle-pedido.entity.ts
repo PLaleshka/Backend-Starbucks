@@ -31,6 +31,14 @@ export class DetallePedido {
   @Column({ nullable: true, type: 'varchar' })
   extras!: string | null;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  precioUnitario!: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  precioTotal!: number;
+
+  @Column({ type: 'json', nullable: true })
+  detallePersonalizacion?: any;
 
   @ManyToOne(() => Pedido, pedido => pedido.detallePedidos)
   @JoinColumn({ name: 'id_pedido' })

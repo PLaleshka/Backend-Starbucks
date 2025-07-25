@@ -34,7 +34,7 @@ export class PedidoController {
   async getPedido(@Param('id') id: number): Promise<PedidoResponseDTO> {
     const pedido = await this.pedidoService.findById(id);
     if (!pedido) {
-      throw new Error(`pedido con id ${id} no encontrado`);
+      throw new Error(`Pedido con id ${id} no encontrado`);
     }
     return plainToInstance(PedidoResponseDTO, pedido, {
       excludeExtraneousValues: true,
@@ -69,10 +69,7 @@ export class PedidoController {
   }
 
   @Delete(':id')
-  async deletePedido(
-    @Param('id') id: number,
-    @Res() response: Response,
-  ): Promise<Response> {
+  async deletePedido(@Param('id') id: number, @Res() response: Response): Promise<Response> {
     const deleted = await this.pedidoService.delete(id);
     if (!deleted) {
       return response.status(404).send();

@@ -1,37 +1,37 @@
 import { IsEmail, IsEnum, IsOptional, IsString, IsNumber, MinLength } from 'class-validator';
 
 export class UsuarioUpdateDTO {
-    @IsOptional()
-    @IsString()
-    nombre?: string;
+  @IsOptional()
+  @IsString()
+  nombre?: string;
 
-    @IsOptional()
-    @IsString()
-    apellido?: string;
+  @IsOptional()
+  @IsString()
+  apellido?: string;
 
-    @IsOptional()
-    @IsEmail()
-    correoElectronico?: string;
+  @IsOptional()
+  @IsEmail()
+  correoElectronico?: string;
 
-    @IsOptional()
-    @IsString()
-    @MinLength(6)
-    contraseña?: string;
+  @IsOptional()
+  @IsString()
+  @MinLength(6)
+  contraseña?: string;
 
-    @IsOptional()
-    @IsEnum(['cliente', 'barista', 'administrador'])
-    rol?: 'cliente' | 'barista' | 'administrador';
+  @IsOptional()
+  @IsEnum(['cliente', 'barista', 'administrador'])
+  rol?: 'cliente' | 'barista' | 'administrador';
 
-    @IsOptional()
-    @IsString()
-    numeroCelular?: string;
+  @IsOptional()
+  @IsString()
+  numeroCelular?: string;
 
-    @IsOptional()
-    @IsString()
-    telefono?: string;
+  @IsOptional()
+  @IsString()
+  telefono?: string;
 
-    // 👇 NUEVA LÍNEA PARA PERMITIR CAMBIAR LA TIENDA
-    @IsOptional()
-    @IsNumber()
-    id_tienda?: number;
+  // ✅ Campo adicional para permitir cambiar tienda desde el panel admin
+  @IsOptional()
+  @IsNumber()
+  id_tienda?: number;
 }

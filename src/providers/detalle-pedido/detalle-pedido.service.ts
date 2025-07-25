@@ -39,6 +39,8 @@ export class DetallePedidoService {
     detalle.idPedido = dto.idPedido;
     detalle.idProducto = dto.idProducto;
     detalle.cantidad = dto.cantidad;
+
+    // ✅ Campos opcionales de personalización
     detalle.tamano = dto.tamano ?? '';
     detalle.temperatura = dto.temperatura ?? '';
     detalle.nivelDulzura = dto.nivelDulzura ?? '';

@@ -1,4 +1,12 @@
-import {Body,Controller,Delete,Get,Param,Post,Put} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { UsuarioService } from 'src/providers/usuario/usuario.service';
 import { UsuarioDTO } from './dto/Usuario.dto';
 import { UsuarioUpdateDTO } from './dto/UsuarioUpdateDTO';
@@ -23,7 +31,7 @@ export class UsuarioController {
       numeroCelular: usuario.numeroCelular ?? '',
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
-      rol: usuario.rol
+      rol: usuario.rol,
     }));
   }
 
@@ -42,7 +50,7 @@ export class UsuarioController {
       numeroCelular: usuario.numeroCelular ?? '',
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
-      rol: usuario.rol
+      rol: usuario.rol,
     };
   }
 
@@ -57,14 +65,14 @@ export class UsuarioController {
       data: null,
       statusCode: 200,
       statusDescription: 'Usuario creado correctamente',
-      errors: null
+      errors: [],
     };
   }
 
   @Put(':id')
   async putUsuario(
     @Param('id') id: number,
-    @Body() request: UsuarioUpdateDTO
+    @Body() request: UsuarioUpdateDTO,
   ): Promise<IPutUsuarioResponse> {
     const result: UpdateResult | undefined = await this.usuarioService.update(id, request);
 
@@ -73,7 +81,7 @@ export class UsuarioController {
         data: null,
         statusCode: 404,
         statusDescription: 'Usuario no encontrado',
-        errors: ['No se pudo actualizar el usuario']
+        errors: ['No se pudo actualizar el usuario'],
       };
     }
 
@@ -81,7 +89,7 @@ export class UsuarioController {
       data: null,
       statusCode: 200,
       statusDescription: 'Usuario actualizado correctamente',
-      errors: null
+      errors: [],
     };
   }
 
@@ -93,14 +101,29 @@ export class UsuarioController {
       return {
         statusCode: 404,
         statusDescription: 'Usuario no encontrado o no se pudo eliminar',
-        errors: null
+        errors: [],
       };
     }
 
     return {
       statusCode: 200,
       statusDescription: 'Usuario eliminado correctamente',
-      errors: null
+      errors: [],
     };
+  }
+
+  // ✅ NUEVO: LOGIN SIMPLE
+  @Post('login')
+  async login(
+    @Body() datos: { correoElectronico: string; contraseña: string },
+  ): Promise<Omit<Usuario, 'contraseña'>> {
+    const usuario = await this.usuarioService.login(datos.correoElectronico, datos.contraseña);
+
+    if (!usuario) {
+      throw new Error('Correo o contraseña incorrectos');
+    }
+
+    const { contraseña, ...usuarioSinContraseña } = usuario;
+    return usuarioSinContraseña;
   }
 }

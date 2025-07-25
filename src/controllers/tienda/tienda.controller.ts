@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { TiendaService } from 'src/providers/tienda/tienda.service';
 import { IPostTiendaRequest } from './dto/IPostTiendaRequest';
 import { IPostTiendaResponse } from './dto/IPostTiendaResponse';
@@ -10,13 +18,13 @@ import { Usuario } from '../database/entities/usuario.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-@Controller('tienda')
+@Controller('api/tienda')
 export class TiendaController {
   constructor(
     private tiendaService: TiendaService,
 
     @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>
+    private readonly usuarioRepository: Repository<Usuario>,
   ) {}
 
   @Post()
@@ -24,7 +32,9 @@ export class TiendaController {
     let administrador: Usuario | null = null;
 
     if (request.idAdministrador !== null) {
-      administrador = await this.usuarioRepository.findOneBy({ idUsuario: request.idAdministrador });
+      administrador = await this.usuarioRepository.findOneBy({
+        idUsuario: request.idAdministrador,
+      });
 
       if (!administrador || administrador.rol !== 'administrador') {
         throw new Error('Administrador no encontrado o rol incorrecto');
@@ -56,7 +66,7 @@ export class TiendaController {
   async getAllTiendas(): Promise<IGetTiendaResponse[]> {
     const tiendas: TiendaEntity[] = await this.tiendaService.getAllTiendas();
 
-    const response: IGetTiendaResponse[] = tiendas.map(tienda => ({
+    const response: IGetTiendaResponse[] = tiendas.map((tienda) => ({
       idTienda: tienda.idTienda,
       nombreTienda: tienda.nombreTienda,
       horario: tienda.horario,
@@ -65,12 +75,14 @@ export class TiendaController {
       disponibilidad: tienda.disponibilidad,
       correoElectronico: tienda.correoElectronico,
       contraseña: tienda.contraseña,
-      administrador: tienda.administrador ? {
-        idAdministrador: tienda.administrador.idUsuario,
-        nombre: tienda.administrador.nombre,
-        apellido: tienda.administrador.apellido,
-        correoElectronico: tienda.administrador.correoElectronico,
-      } : null,
+      administrador: tienda.administrador
+        ? {
+            idAdministrador: tienda.administrador.idUsuario,
+            nombre: tienda.administrador.nombre,
+            apellido: tienda.administrador.apellido,
+            correoElectronico: tienda.administrador.correoElectronico,
+          }
+        : null,
     }));
 
     return response;
@@ -79,7 +91,7 @@ export class TiendaController {
   @Put(':id')
   async putTienda(
     @Param('id') id: number,
-    @Body() request: IPutTiendaRequest
+    @Body() request: IPutTiendaRequest,
   ): Promise<IPutTiendaResponse> {
     const tienda = await this.tiendaService.updateTienda(id, request);
 
@@ -92,7 +104,7 @@ export class TiendaController {
       };
     }
 
-    const response: IPutTiendaResponse = {
+    return {
       data: {
         idTienda: tienda.idTienda,
         nombreTienda: tienda.nombreTienda,
@@ -115,8 +127,6 @@ export class TiendaController {
       statusDescription: 'Tienda actualizada correctamente',
       errors: null,
     };
-
-    return response;
   }
 
   @Delete(':id')

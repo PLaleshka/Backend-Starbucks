@@ -1,7 +1,13 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Pedido } from "./pedido.entity";
-import { TiendaEntity } from "./tienda.entity";
-
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn
+} from 'typeorm';
+import { Pedido } from './pedido.entity';
+import { TiendaEntity } from './tienda.entity';
 
 @Entity('usuario')
 export class Usuario {
@@ -33,16 +39,20 @@ export class Usuario {
   @OneToMany(() => Pedido, pedido => pedido.usuario)
   pedidos?: Pedido[];
 
+  // BARISTA: pedidos atendidos
   @OneToMany(() => Pedido, pedido => pedido.barista)
-  pedidosAtendidos?: Pedido[]; // barista
+  pedidosAtendidos?: Pedido[];
 
   // ADMINISTRADOR: tiendas que administra
   @OneToMany(() => TiendaEntity, tienda => tienda.administrador)
   tiendasAdministradas?: TiendaEntity[];
 
-  // BARISTA: tienda donde trabaja (solo una tienda por barista)
+  // BARISTA: referencia al ID de la tienda
+  @Column({ name: 'id_tienda', nullable: true })
+  idTienda?: number;
+
+  // BARISTA: tienda donde trabaja
   @ManyToOne(() => TiendaEntity, tienda => tienda.baristas)
   @JoinColumn({ name: 'id_tienda' })
   tiendaTrabajo?: TiendaEntity;
-
 }

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Pedido } from './pedido.entity';
 import { Inventario } from './inventario.entity';
 import { Stock } from './stock.entity';
@@ -30,9 +37,12 @@ export class TiendaEntity {
   @Column()
   contraseña!: string;
 
+  @Column({ name: 'id_usuario_administrador', nullable: true })
+  idUsuarioAdministrador?: number;
+
   @ManyToOne(() => Usuario, usuario => usuario.tiendasAdministradas, { nullable: true })
   @JoinColumn({ name: 'id_usuario_administrador' })
-  administrador!: Usuario;
+  administrador?: Usuario;
 
   @OneToMany(() => Usuario, usuario => usuario.tiendaTrabajo)
   baristas?: Usuario[];
