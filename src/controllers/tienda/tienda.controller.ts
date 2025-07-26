@@ -10,7 +10,7 @@ import { Usuario } from '../database/entities/usuario.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-@Controller('/tienda')
+@Controller('api/tienda')
 export class TiendaController {
   constructor(
     private tiendaService: TiendaService,

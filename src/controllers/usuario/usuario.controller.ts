@@ -8,7 +8,7 @@ import { IPutUsuarioResponse } from './dto/IPutUsuarioResponse';
 import { Usuario } from '../database/entities/usuario.entity';
 import { UpdateResult } from 'typeorm';
 
-@Controller('usuario')
+@Controller('api/usuario')
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
