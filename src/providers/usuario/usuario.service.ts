@@ -18,7 +18,8 @@ export class UsuarioService {
 
   public async getUsuarioById(id: number): Promise<Usuario> {
     try {
-      const result = await this.usuarioRepository.createQueryBuilder('usuario')
+      const result = await this.usuarioRepository
+        .createQueryBuilder('usuario')
         .where('usuario.idusuario = :id', { id })
         .getOne();
 
@@ -33,11 +34,10 @@ export class UsuarioService {
   }
 
   public async create(usuario: Usuario): Promise<Usuario> {
-    // 🔐 Encriptar la contraseña antes de guardar
     const hashedPassword = await bcrypt.hash(usuario.contraseña, 10);
     const nuevoUsuario = this.usuarioRepository.create({
       ...usuario,
-      contraseña: hashedPassword
+      contraseña: hashedPassword,
     });
 
     return await this.usuarioRepository.save(nuevoUsuario);
@@ -58,7 +58,6 @@ export class UsuarioService {
     return result.affected !== 0;
   }
 
-  // ✅ Método seguro para login con bcrypt
   public async login(correoElectronico: string, contrasena: string): Promise<Usuario | null> {
     const usuario = await this.usuarioRepository.findOne({ where: { correoElectronico } });
 
@@ -73,4 +72,12 @@ export class UsuarioService {
 
     return usuario;
   }
+
+  public async getUsuariosConRol(rol: string): Promise<Usuario[]> {
+  return await this.usuarioRepository
+    .createQueryBuilder('usuario')
+    .where('LOWER(usuario.rol) = :rol', { rol: rol.toLowerCase() })
+    .getMany();
+}
+
 }

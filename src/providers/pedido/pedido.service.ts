@@ -27,7 +27,7 @@ export class PedidoService {
   public async getPedido(id: number): Promise<Pedido> {
     try {
       const result = await this.pedidoRepository.createQueryBuilder('pedido')
-        .where('pedido.idPedido = :id', { id })
+        .where('pedido.id_pedido = :id', { id }) // 🔧 Corregido: id_pedido
         .getOne();
 
       if (!result) {
