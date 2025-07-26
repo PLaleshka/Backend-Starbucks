@@ -1,4 +1,4 @@
-import {Body,Controller,Delete,Get,Param,Post,Put} from '@nestjs/common';
+import {Body,Controller,Delete,Get,Param,Post,Put, UseGuards} from '@nestjs/common';
 import { UsuarioService } from 'src/providers/usuario/usuario.service';
 import { UsuarioDTO } from './dto/Usuario.dto';
 import { UsuarioUpdateDTO } from './dto/UsuarioUpdateDTO';
@@ -7,7 +7,8 @@ import { IPostUsuarioResponse } from './dto/IPostUsuarioResponse';
 import { IPutUsuarioResponse } from './dto/IPutUsuarioResponse';
 import { Usuario } from '../database/entities/usuario.entity';
 import { UpdateResult } from 'typeorm';
-import {ApiTags,ApiOperation,ApiResponse,ApiParam,ApiBody} from '@nestjs/swagger';
+import {ApiTags,ApiOperation,ApiResponse,ApiParam,ApiBody, } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Usuario')
 @Controller('usuario')
@@ -128,5 +129,17 @@ export class UsuarioController {
     const { contraseña, ...usuarioSinContraseña } = usuario;
     return usuarioSinContraseña;
   }
+
+  @Get('baristas-disponibles/:idTienda')
+  @ApiOperation({ summary: 'Obtener baristas disponibles por tienda' })
+  @ApiParam({ name: 'idTienda', type: Number })
+  @ApiResponse({ status: 200, description: 'Lista de baristas disponibles', type: [Usuario] })
+  async getBaristasDisponibles(
+    @Param('idTienda') idTienda: number
+  ): Promise<Usuario[]> {
+    return await this.usuarioService.getBaristasDisponiblesPorTienda(idTienda);
+  }
+
+
 
 }

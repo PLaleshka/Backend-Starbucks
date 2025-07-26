@@ -69,16 +69,26 @@ export class PedidoController {
   @ApiResponse({
     status: 200,
     description: 'Pedido actualizado exitosamente',
-    type: UpdateResult,
+    type: PedidoResponseDTO,
   })
   @ApiResponse({ status: 404, description: 'Pedido no encontrado' })
   async putpedido(
     @Param('id') id: number,
     @Body() request: PedidoUpdateDTO,
-    @Res() response: Response,
-  ): Promise<UpdateResult | undefined> {
-    return await this.pedidoService.update(id, request);
+  ): Promise<PedidoResponseDTO> {
+    const result = await this.pedidoService.update(id, request);
+
+    if (!result) {
+      throw new NotFoundException(`No se encontró pedido con ID ${id}`);
+    }
+
+    // Opcional: traer el pedido actualizado para devolverlo al frontend
+    const pedidoActualizado = await this.pedidoService.getPedido(id);
+    return plainToInstance(PedidoResponseDTO, pedidoActualizado, {
+      excludeExtraneousValues: true,
+    });
   }
+
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar pedido de la lista en memoria (mocked)' })

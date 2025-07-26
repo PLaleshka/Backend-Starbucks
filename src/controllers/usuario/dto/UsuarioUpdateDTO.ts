@@ -66,4 +66,12 @@ export class UsuarioUpdateDTO {
   @IsOptional()
   @IsString()
   telefono?: string;
+
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'ID de la tienda donde trabaja el barista (solo para baristas)',
+  })
+  @IsOptional()
+  idTienda?: number;
+
 }
