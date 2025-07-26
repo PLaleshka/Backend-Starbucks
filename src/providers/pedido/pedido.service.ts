@@ -41,47 +41,87 @@ export class PedidoService {
   }
 
   public async create(pedidoDto: PedidoDTO): Promise<Pedido> {
+    /* ───── datos fijos del pedido ───── */
     const pedido = new Pedido();
-    pedido.fecha = new Date();
-    pedido.subtotal = pedidoDto.subtotal;
-    pedido.iva = pedidoDto.iva;
+    pedido.fecha          = new Date();
+    pedido.subtotal       = pedidoDto.subtotal;
+    pedido.iva            = pedidoDto.iva;
     pedido.tiempoEstimado = pedidoDto.tiempoEstimado;
-    pedido.estadoPedido = pedidoDto.estadoPedido;
+    pedido.estadoPedido   = pedidoDto.estadoPedido;
 
-    const cliente = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.cliente });
-    if (!cliente || cliente.rol !== 'cliente') throw new Error('Cliente no encontrado o rol incorrecto');
-
-    const tienda = await this.tiendaRepository.findOneBy({ idTienda: pedidoDto.tienda });
-    if (!tienda) throw new Error('Tienda no encontrada');
-
-    let barista: Usuario | null = null;
-    if (pedidoDto.barista) {
-      barista = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.barista });
-      if (!barista || barista.rol !== 'barista') throw new Error('Barista no encontrado o rol incorrecto');
+    /* ───── cliente ───── */
+    const cliente = await this.usuarioRepository.findOneBy({
+      idUsuario: pedidoDto.cliente,
+    });
+    if (!cliente || cliente.rol !== 'cliente') {
+      throw new Error('Cliente no encontrado o rol incorrecto');
     }
 
-    pedido.usuario = cliente;
-    pedido.tienda = tienda;
-    if (barista) pedido.barista = barista;
+    /* ───── tienda + baristas ───── */
+    const tienda = await this.tiendaRepository.findOne({
+      where: { idTienda: pedidoDto.tienda },
+      relations: ['baristas'],           // ⚠️ importante para traer baristas
+    });
+    if (!tienda) throw new Error('Tienda no encontrada');
+
+    const barista = tienda.baristas.find(
+      (b) => b.rol === 'barista' && b.disponibilidad === 'disponible',
+    );
+    if (!barista) throw new Error('No hay baristas disponibles en esta tienda');
+
+    /* ───── marcar barista ocupado ───── */
+    barista.disponibilidad = 'no disponible';
+    await this.usuarioRepository.save(barista);
+
+    /* ───── vincular y guardar ───── */
+    pedido.usuario = cliente;   // quien hace el pedido
+    pedido.tienda  = tienda;
+    pedido.barista = barista;
 
     return await this.pedidoRepository.save(pedido);
   }
 
-  public async update(id: number, pedidoDto: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
+  public async update(
+    id: number,
+    pedidoDto: PedidoUpdateDTO,
+  ): Promise<UpdateResult | undefined> {
+    /* ---------- datos que se pueden actualizar ---------- */
     const updateData: Partial<Pedido> = {
-      estadoPedido: pedidoDto.estadoPedido,
-      subtotal: pedidoDto.subtotal,
-      iva: pedidoDto.iva,
+      estadoPedido:   pedidoDto.estadoPedido,
+      subtotal:       pedidoDto.subtotal,
+      iva:            pedidoDto.iva,
       tiempoEstimado: pedidoDto.tiempoEstimado,
     };
 
+    /* ---------- posible cambio de cliente ---------- */
     if (pedidoDto.cliente) {
-      const cliente = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.cliente });
-      if (!cliente || cliente.rol !== 'cliente') throw new Error('Cliente no encontrado o rol incorrecto');
+      const cliente = await this.usuarioRepository.findOneBy({
+        idUsuario: pedidoDto.cliente,
+      });
+      if (!cliente || cliente.rol !== 'cliente') {
+        throw new Error('Cliente no encontrado o rol incorrecto');
+      }
       updateData.usuario = cliente;
     }
 
+    /* ---------- actualizar pedido ---------- */
     const result = await this.pedidoRepository.update(id, updateData);
-    return result.affected === 0 ? undefined : result;
+    if (!result.affected) return undefined;
+
+    /* ---------- si se finaliza, liberar barista ---------- */
+    if (pedidoDto.estadoPedido === 'finalizado') {
+      const pedido = await this.pedidoRepository.findOne({
+        where: { idPedido: id },
+        relations: ['barista'],
+      });
+
+      if (pedido?.barista && pedido.barista.disponibilidad === 'no disponible') {
+        pedido.barista.disponibilidad = 'disponible';
+        await this.usuarioRepository.save(pedido.barista);
+      }
+    }
+
+    return result;
   }
+
 }

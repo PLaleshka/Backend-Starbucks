@@ -7,4 +7,5 @@ export interface IGetUsuarioResponse {
     rol: 'cliente' | 'barista' | 'administrador';
     numeroCelular?: string | null;
     telefono?: string | null;
+    disponibilidad: 'disponible' | 'no disponible';
 }

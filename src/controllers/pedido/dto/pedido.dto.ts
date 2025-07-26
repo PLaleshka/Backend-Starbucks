@@ -41,10 +41,4 @@ export class PedidoDTO {
   @IsNumber()
   @IsPositive()
   tienda?: number;
-
-  @ApiPropertyOptional({ description: 'ID del barista encargado del pedido', example: 5 })
-  @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  barista?: number;
 }

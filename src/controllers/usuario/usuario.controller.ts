@@ -27,6 +27,7 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
+      disponibilidad: usuario.disponibilidad
     }));
   }
 
@@ -49,6 +50,7 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
+      disponibilidad: usuario.disponibilidad
     };
   }
 
@@ -73,7 +75,7 @@ export class UsuarioController {
   @ApiOperation({ summary: 'Actualizar un usuario por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UsuarioUpdateDTO })
-  @ApiResponse({ status: 200, description: 'Usuario actualizado correctamente' })
+  @ApiResponse({ status: 200, description: 'Usuario actualizado correctamente'})
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   async putUsuario(@Param('id') id: number, @Body() request: UsuarioUpdateDTO): Promise<IPutUsuarioResponse> {
     const result: UpdateResult | undefined = await this.usuarioService.update(id, request);
@@ -126,4 +128,5 @@ export class UsuarioController {
     const { contraseña, ...usuarioSinContraseña } = usuario;
     return usuarioSinContraseña;
   }
+
 }

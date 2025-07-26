@@ -38,7 +38,7 @@ export class TiendaEntity {
   administrador?: Usuario;
 
   @OneToMany(() => Usuario, usuario => usuario.tiendaTrabajo)
-  baristas?: Usuario[];
+  baristas!: Usuario[];
 
   @OneToMany(() => Pedido, pedido => pedido.tienda)
   pedidos!: Pedido[];

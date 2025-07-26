@@ -73,4 +73,19 @@ export class UsuarioService {
 
     return usuario;
   }
+
+  // src/providers/usuario/usuario.service.ts
+
+  public async getBaristasDisponiblesPorTienda(idTienda: number): Promise<Usuario[]> {
+    return await this.usuarioRepository.find({
+      where: {
+        rol: 'barista',
+        disponibilidad: 'disponible',
+        tiendaTrabajo: { idTienda }
+      },
+      relations: ['tiendaTrabajo']
+    });
+  }
+
+
 }

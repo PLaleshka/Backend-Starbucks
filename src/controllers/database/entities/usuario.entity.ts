@@ -29,6 +29,9 @@ export class Usuario {
   @Column({ nullable: true })
   numeroCelular?: string;
 
+  @Column({ default: 'disponible' })
+  disponibilidad!: 'disponible' | 'no disponible';
+
   // CLIENTE: pedidos realizados
   @OneToMany(() => Pedido, pedido => pedido.usuario)
   pedidos?: Pedido[];

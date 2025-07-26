@@ -17,6 +17,7 @@ import { JwtAuthGuard } from 'src/controllers/auth/jwt-auth.guard';
 @UseGuards(JwtAuthGuard) // Todas las rutas protegidas
 @Controller('tienda')
 export class TiendaController {
+  usuarioService: any;
   constructor(
     private tiendaService: TiendaService,
     @InjectRepository(Usuario)
