@@ -11,9 +11,10 @@ import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult';
 import { PedidoUpdateDTO } from './dto/PedidoUpdateDTO';
 import { plainToInstance } from 'class-transformer';
 import { PedidoResponseDTO } from './dto/PedidoResponseDTO';
+import { PedidoCreateRequestDTO } from './dto/PedidoCreateRequestDTO';
 
 
-@Controller('Pedido') 
+@Controller('api/pedido') 
 export class PedidoController {
     private pedidos: IGetPedidoResponse[] = [
 
@@ -39,9 +40,9 @@ export class PedidoController {
     
 
     @Post()
-    async createPedido(@Body() pedidoDto: PedidoDTO): Promise<PedidoResponseDTO> {
-        const pedido = await this.pedidoService.create(pedidoDto);
-        return plainToInstance(PedidoResponseDTO, pedido, { excludeExtraneousValues: true });
+    async createPedido(@Body() pedidoDto: PedidoCreateRequestDTO): Promise<PedidoResponseDTO> {
+    const pedido = await this.pedidoService.crearPedido(pedidoDto);
+    return plainToInstance(PedidoResponseDTO, pedido, { excludeExtraneousValues: true });
     }
 
     @Put(':id')

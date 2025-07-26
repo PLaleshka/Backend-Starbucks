@@ -1,87 +1,91 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { Pedido } from 'src/controllers/database/entities/pedido.entity';
-import { PedidoUpdateDTO } from 'src/controllers/pedido/dto/PedidoUpdateDTO';
-import { PedidoDTO } from 'src/controllers/pedido/dto/pedido.dto';
-import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
+import { DetallePedido } from 'src/controllers/database/entities/detalle-pedido.entity';
 import { Usuario } from 'src/controllers/database/entities/usuario.entity';
+import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
+import { PedidoCreateRequestDTO } from 'src/controllers/pedido/dto/PedidoCreateRequestDTO';
+import { PedidoUpdateDTO } from 'src/controllers/pedido/dto/PedidoUpdateDTO';
 
 @Injectable()
 export class PedidoService {
   constructor(
     @InjectRepository(Pedido)
     private readonly pedidoRepository: Repository<Pedido>,
-
+    @InjectRepository(DetallePedido)
+    private readonly detallePedidoRepository: Repository<DetallePedido>,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-
     @InjectRepository(TiendaEntity)
     private readonly tiendaRepository: Repository<TiendaEntity>,
   ) {}
+  
 
-  public async getAllPedidos(): Promise<Pedido[]> {
-    return await this.pedidoRepository.find();
-  }
+  async crearPedido(dto: PedidoCreateRequestDTO) {
+    // Validar usuario y tienda
+    const usuario = await this.usuarioRepository.findOneBy({ idUsuario: dto.id_usuario_cliente });
+    if (!usuario) throw new HttpException('Usuario no encontrado', 404);
 
-  public async getPedido(id: number): Promise<Pedido> {
-    try {
-      const result = await this.pedidoRepository.createQueryBuilder('pedido')
-        .where('pedido.idPedido = :id', { id })
-        .getOne();
+    const tienda = await this.tiendaRepository.findOneBy({ idTienda: dto.id_tienda });
+    if (!tienda) throw new HttpException('Tienda no encontrada', 404);
 
-      if (!result) {
-        throw new Error(`Pedido con id ${id} no encontrado`);
-      }
+    // Asignar barista automáticamente (ejemplo: el primero disponible)
+    const barista = await this.usuarioRepository.findOne({
+      where: { rol: 'barista', idTienda: tienda.idTienda },
+    });
 
-      return result;
-    } catch (error: any) {
-      throw new Error(error);
-    }
-  }
+    
 
-  public async create(pedidoDto: PedidoDTO): Promise<Pedido> {
+    // Calcular IVA (ejemplo 16%)
+    const iva = +(dto.subtotal * 0.16).toFixed(2);
+
+    // Crear pedido
     const pedido = new Pedido();
+    pedido.usuario = usuario;
+    pedido.tienda = tienda;
+    pedido.barista = barista || undefined;
+    pedido.subtotal = dto.subtotal;
+    pedido.iva = iva;
+    pedido.estadoPedido = 'pendiente'; // Estado inicial
+    pedido.tiempoEstimado = '15'; // 
     pedido.fecha = new Date();
-    pedido.subtotal = pedidoDto.subtotal;
-    pedido.iva = pedidoDto.iva;
-    pedido.tiempoEstimado = pedidoDto.tiempoEstimado;
-    pedido.estadoPedido = pedidoDto.estadoPedido;
 
-    const cliente = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.cliente });
-    if (!cliente || cliente.rol !== 'cliente') throw new Error('Cliente no encontrado o rol incorrecto');
+    const pedidoGuardado = await this.pedidoRepository.save(pedido);
 
-    const tienda = await this.tiendaRepository.findOneBy({ idTienda: pedidoDto.tienda });
-    if (!tienda) throw new Error('Tienda no encontrada');
-
-    let barista: Usuario | null = null;
-    if (pedidoDto.barista) {
-      barista = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.barista });
-      if (!barista || barista.rol !== 'barista') throw new Error('Barista no encontrado o rol incorrecto');
+    // Crear detalles del pedido
+    for (const prod of dto.productos) {
+      const detalle = new DetallePedido();
+      detalle.pedido = pedidoGuardado;
+      detalle.producto = { idProducto: prod.idProducto } as any;
+      detalle.idPedido = pedidoGuardado.idPedido;
+      detalle.idProducto = prod.idProducto;
+      detalle.cantidad = prod.cantidad;
+      detalle.precioUnitario = prod.precioUnitario;
+      detalle.precioTotal = prod.precioTotal;
+      detalle.detallePersonalizacion = prod.detallePersonalizacion ?? null;
+      await this.detallePedidoRepository.save(detalle);
     }
 
-    pedido.usuario = cliente;
-    pedido.tienda = tienda;
-    if (barista) pedido.barista = barista;
+    // Devuelve el pedido y sus detalles
+    const detalles = await this.detallePedidoRepository.find({
+      where: { idPedido: pedidoGuardado.idPedido },
+    });
 
-    return await this.pedidoRepository.save(pedido);
+    return {
+      pedido: pedidoGuardado,
+      detalles,
+    };
   }
 
-  public async update(id: number, pedidoDto: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
-    const updateData: Partial<Pedido> = {
-      estadoPedido: pedidoDto.estadoPedido,
-      subtotal: pedidoDto.subtotal,
-      iva: pedidoDto.iva,
-      tiempoEstimado: pedidoDto.tiempoEstimado,
-    };
+  async update(id: number, data: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
+  // Si el DTO trae solo el ID, conviértelo al formato esperado por TypeORM
+  const updateData: any = { ...data };
+  if (updateData.cliente && typeof updateData.cliente === 'number') {
+    updateData.cliente = { idUsuario: updateData.cliente };
+  }
+  // Haz lo mismo para otras relaciones si es necesario
 
-    if (pedidoDto.cliente) {
-      const cliente = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.cliente });
-      if (!cliente || cliente.rol !== 'cliente') throw new Error('Cliente no encontrado o rol incorrecto');
-      updateData.usuario = cliente;
-    }
-
-    const result = await this.pedidoRepository.update(id, updateData);
-    return result.affected === 0 ? undefined : result;
+  return await this.pedidoRepository.update(id, updateData);
   }
 }

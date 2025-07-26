@@ -1,4 +1,6 @@
+import { Usuario } from 'src/controllers/database/entities/usuario.entity';
+
 export class LoginResponseDTO {
-  status!: string;
-  access_token!: string;
+  token!: string;
+  usuario!: Partial<Usuario>;
 }
