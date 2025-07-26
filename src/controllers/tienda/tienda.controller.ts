@@ -13,8 +13,6 @@ import {ApiTags,ApiOperation,ApiResponse,ApiBody,ApiParam,ApiBearerAuth} from '@
 import { JwtAuthGuard } from 'src/controllers/auth/jwt-auth.guard';
 
 @ApiTags('Tienda')
-@ApiBearerAuth() // Swagger muestra que requiere JWT
-@UseGuards(JwtAuthGuard) // Todas las rutas protegidas
 @Controller('tienda')
 export class TiendaController {
   usuarioService: any;
