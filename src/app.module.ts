@@ -44,6 +44,7 @@ import { ProductoOpcionController } from './controllers/producto-opcion/producto
 import { OpcionPersonalizacionController } from './controllers/opcion-personalizacion/opcion-personalizacion.controller';
 import { OpcionPersonalizacionService } from './providers/opcion-personalizacion/opcion.personalizacion.service';
 import { ProductoOpcionService } from './providers/producto-opcion/producto-opcion.service';
+import { AuthModule } from './controllers/auth/auth.module';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { ProductoOpcionService } from './providers/producto-opcion/producto-opci
     ]),
 
     ControllersModule,
+    AuthModule
   ],
 
   controllers: [
