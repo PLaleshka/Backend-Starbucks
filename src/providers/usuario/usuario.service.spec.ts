@@ -1,8 +1,8 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsuarioService } from './usuario.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Usuario } from 'src/controllers/database/entities/usuario.entity';
+import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
 
 describe('UsuarioService', () => {
   let service: UsuarioService;
@@ -13,7 +13,11 @@ describe('UsuarioService', () => {
         UsuarioService,
         {
           provide: getRepositoryToken(Usuario),
-          useValue: {},
+          useValue: {}, // mock del repositorio Usuario
+        },
+        {
+          provide: getRepositoryToken(TiendaEntity),
+          useValue: {}, // mock del repositorio Tienda
         },
       ],
     }).compile();
