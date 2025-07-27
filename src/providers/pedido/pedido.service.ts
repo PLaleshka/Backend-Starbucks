@@ -1,25 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { Pedido } from 'src/controllers/database/entities/pedido.entity';
-import { PedidoUpdateDTO } from 'src/controllers/pedido/dto/PedidoUpdateDTO';
-import { PedidoDTO } from 'src/controllers/pedido/dto/pedido.dto';
-import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
+import { DetallePedido } from 'src/controllers/database/entities/detalle-pedido.entity';
 import { Usuario } from 'src/controllers/database/entities/usuario.entity';
+import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
+import { PedidoCreateRequestDTO } from 'src/controllers/pedido/dto/PedidoCreateRequestDTO';
+import { PedidoUpdateDTO } from 'src/controllers/pedido/dto/PedidoUpdateDTO';
 
 @Injectable()
 export class PedidoService {
   constructor(
     @InjectRepository(Pedido)
     private readonly pedidoRepository: Repository<Pedido>,
-
+    @InjectRepository(DetallePedido)
+    private readonly detallePedidoRepository: Repository<DetallePedido>,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-
     @InjectRepository(TiendaEntity)
     private readonly tiendaRepository: Repository<TiendaEntity>,
   ) {}
 
+  // GET ALL pedidos
   public async getAllPedidos(): Promise<Pedido[]> {
     return await this.pedidoRepository.find({
       relations: ['cliente', 'barista', 'tienda'],
@@ -27,6 +29,7 @@ export class PedidoService {
     });
   }
 
+  // GET pedido por ID
   public async getPedido(id: number): Promise<Pedido> {
     try {
       const result = await this.pedidoRepository.findOne({
@@ -39,53 +42,69 @@ export class PedidoService {
           'detallePedidos.producto'
         ]
       });
-
       if (!result) {
-        throw new Error(`Pedido con id ${id} no encontrado`);
+        throw new HttpException('Pedido no encontrado', 404);
       }
-
       return result;
-    } catch (error: any) {
-      throw new Error(error);
+    } catch (error) {
+      throw new HttpException('Pedido no encontrado', 404);
     }
   }
 
-  public async create(pedidoDto: PedidoDTO): Promise<Pedido> {
+  // CREAR pedido
+  async crearPedido(dto: PedidoCreateRequestDTO) {
+    const usuario = await this.usuarioRepository.findOneBy({ idUsuario: dto.id_usuario_cliente });
+    if (!usuario) throw new HttpException('Usuario no encontrado', 404);
+
+    const tienda = await this.tiendaRepository.findOneBy({ idTienda: dto.id_tienda });
+    if (!tienda) throw new HttpException('Tienda no encontrada', 404);
+
+    const barista = await this.usuarioRepository.findOne({
+      where: { rol: 'barista', idTienda: tienda.idTienda },
+    });
+
+    const iva = +(dto.subtotal * 0.16).toFixed(2);
+
     const pedido = new Pedido();
+    pedido.cliente = usuario;
+    pedido.tienda = tienda;
+    pedido.barista = barista || undefined;
+    pedido.subtotal = dto.subtotal;
+    pedido.iva = iva;
+    pedido.estadoPedido = 'pendiente';
+    pedido.tiempoEstimado = '15';
     pedido.fecha = new Date();
-    pedido.subtotal = pedidoDto.subtotal;
-    pedido.iva = pedidoDto.iva;
-    pedido.tiempoEstimado = pedidoDto.tiempoEstimado;
-    pedido.estadoPedido = pedidoDto.estadoPedido;
 
-    const cliente = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.cliente });
-    if (!cliente || cliente.rol !== 'cliente') throw new Error('Cliente no encontrado o rol incorrecto');
+    const pedidoGuardado = await this.pedidoRepository.save(pedido);
 
-    const tienda = await this.tiendaRepository.findOneBy({ idTienda: pedidoDto.tienda });
-    if (!tienda) throw new Error('Tienda no encontrada');
-
-    let barista: Usuario | null = null;
-    if (pedidoDto.barista) {
-      barista = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.barista });
-      if (!barista || barista.rol !== 'barista') throw new Error('Barista no encontrado o rol incorrecto');
+    for (const prod of dto.productos) {
+      const detalle = new DetallePedido();
+      detalle.pedido = pedidoGuardado;
+      detalle.producto = { idProducto: prod.idProducto } as any;
+      detalle.idPedido = pedidoGuardado.idPedido;
+      detalle.idProducto = prod.idProducto;
+      detalle.cantidad = prod.cantidad;
+      detalle.precioUnitario = prod.precioUnitario;
+      detalle.precioTotal = prod.precioTotal;
+      detalle.detallePersonalizacion = prod.detallePersonalizacion ?? null;
+      await this.detallePedidoRepository.save(detalle);
     }
 
-    pedido.cliente = cliente;
-    pedido.tienda = tienda;
-    if (barista) pedido.barista = barista;
+    const detalles = await this.detallePedidoRepository.find({
+      where: { idPedido: pedidoGuardado.idPedido },
+    });
 
-    return await this.pedidoRepository.save(pedido);
+    return {
+      pedido: pedidoGuardado,
+      detalles,
+    };
   }
 
-  public async update(id: number, pedidoDto: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
-    const updateData: Partial<Pedido> = {
-      estadoPedido: pedidoDto.estadoPedido,
-      subtotal: pedidoDto.subtotal,
-      iva: pedidoDto.iva,
-      tiempoEstimado: pedidoDto.tiempoEstimado,
-    };
+  // ACTUALIZAR pedido
+  async update(id: number, pedidoDto: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
+    const updateData: any = { ...pedidoDto };
 
-    if (pedidoDto.cliente) {
+    if (pedidoDto.cliente && typeof pedidoDto.cliente === 'number') {
       const cliente = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.cliente });
       if (!cliente || cliente.rol !== 'cliente') throw new Error('Cliente no encontrado o rol incorrecto');
       updateData.cliente = cliente;

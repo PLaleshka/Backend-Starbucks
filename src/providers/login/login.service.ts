@@ -9,7 +9,7 @@ import { RegisterRequestDTO } from 'src/controllers/login/dto/register-request.d
 import { RegisterWithRoleDTO } from 'src/controllers/login/dto/register-with-role.dto';
 import { LoginRequestDTO } from 'src/controllers/login/dto/login-request.dto';
 import { RegisterResponseDTO } from 'src/controllers/login/dto/register-response.dto';
-import { LoginResponseDTO } from 'src/controllers/login/dto/login-response.dto';
+import { LoginResponseDTO } from 'src/controllers/login/dto/login-response.dto'; // <-- IMPORTANTE
 
 @Injectable()
 export class LoginService {
@@ -23,7 +23,11 @@ export class LoginService {
   public async register(
     request: RegisterRequestDTO,
   ): Promise<RegisterResponseDTO> {
-    const encryptedPassword = await hash(request.contraseña, 10);
+    if (!request.contraseña) {
+      throw new HttpException('La contraseña es obligatoria', 400);
+    }
+    const password: string = request.contraseña;
+    const encryptedPassword = await hash(password, 10);
 
     const usuario = new Usuario();
     Object.assign(usuario, request);
@@ -39,7 +43,11 @@ export class LoginService {
   public async registerWithRole(
     request: RegisterWithRoleDTO,
   ): Promise<RegisterResponseDTO> {
-    const encryptedPassword = await hash(request.contraseña, 10);
+    if (!request.contraseña) {
+      throw new HttpException('La contraseña es obligatoria', 400);
+    }
+    const password: string = request.contraseña;
+    const encryptedPassword = await hash(password, 10);
 
     const usuario = new Usuario();
     Object.assign(usuario, request);
@@ -52,31 +60,39 @@ export class LoginService {
 
   // Validación de credenciales y generación de JWT
   public async validate(
-    credentials: LoginRequestDTO,
-  ): Promise<LoginResponseDTO> {
-    const { correoElectronico, contraseña } = credentials;
+  credentials: LoginRequestDTO,
+): Promise<LoginResponseDTO> {
+  const { correoElectronico, contraseña } = credentials;
 
-    const usuario = await this.usuarioRepository.findOneBy({ correoElectronico });
-    if (!usuario) {
-      throw new HttpException('Usuario no encontrado', 404);
-    }
-
-    const passwordValid = await compare(contraseña, usuario.contraseña);
-    if (!passwordValid) {
-      throw new HttpException('Contraseña incorrecta', 403);
-    }
-
-    const payload = {
-      sub: usuario.idUsuario,
-      email: usuario.correoElectronico,
-      rol: usuario.rol,
-    };
-
-    const token = this.jwtService.sign(payload);
-
-    return {
-      status: 'Usuario autenticado correctamente',
-      access_token: token,
-    };
+  if (!contraseña) {
+    throw new HttpException('La contraseña es obligatoria', 400);
   }
+  const password: string = contraseña;
+
+  const usuario = await this.usuarioRepository.findOneBy({ correoElectronico });
+  if (!usuario) {
+    throw new HttpException('Usuario no encontrado', 404);
+  }
+
+  const passwordValid = await compare(password, usuario.contraseña);
+  if (!passwordValid) {
+    throw new HttpException('Contraseña incorrecta', 403);
+  }
+
+  const payload = {
+    sub: usuario.idUsuario,
+    email: usuario.correoElectronico,
+    rol: usuario.rol,
+  };
+
+  const token = this.jwtService.sign(payload);
+
+  // Elimina la contraseña antes de devolver el usuario
+  const { contraseña: _, ...usuarioSinContraseña } = usuario;
+
+  return {
+    token,
+    usuario: usuarioSinContraseña,
+  };
+ }
 }

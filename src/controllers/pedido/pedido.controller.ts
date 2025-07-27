@@ -11,34 +11,35 @@ import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult';
 import { PedidoUpdateDTO } from './dto/PedidoUpdateDTO';
 import { plainToInstance } from 'class-transformer';
 import { PedidoResponseDTO } from './dto/PedidoResponseDTO';
+import { PedidoCreateRequestDTO } from './dto/PedidoCreateRequestDTO';
 
-@Controller('Pedido')
+@Controller('api/pedido') // Se elige esta ruta por ser más estándar y RESTful
 export class PedidoController {
-    constructor(private pedidoService: PedidoService) {}
+  constructor(private pedidoService: PedidoService) {}
 
-    @Get()
-    public async getPedidos(): Promise<Pedido[]> {
-        return await this.pedidoService.getAllPedidos();
-    }
+  @Get()
+  public async getPedidos(): Promise<Pedido[]> {
+    return await this.pedidoService.getAllPedidos();
+  }
 
-    @Get(':id')
-    async getPedido(@Param('id') id: number): Promise<Pedido> {
-        const pedido = await this.pedidoService.getPedido(id);
-        return pedido;
-    }
+  @Get(':id')
+  async getPedido(@Param('id') id: number): Promise<Pedido> {
+    const pedido = await this.pedidoService.getPedido(id);
+    return pedido;
+  }
 
-    @Post()
-    async createPedido(@Body() pedidoDto: PedidoDTO): Promise<PedidoResponseDTO> {
-        const pedido = await this.pedidoService.create(pedidoDto);
-        return plainToInstance(PedidoResponseDTO, pedido, { excludeExtraneousValues: true });
-    }
+  @Post()
+  async createPedido(@Body() pedidoDto: PedidoCreateRequestDTO): Promise<PedidoResponseDTO> {
+    const pedido = await this.pedidoService.crearPedido(pedidoDto);
+    return plainToInstance(PedidoResponseDTO, pedido, { excludeExtraneousValues: true });
+  }
 
-    @Put(':id')
-    async putPedido(
-        @Param('id') id: number,
-        @Body() request: PedidoUpdateDTO,
-        @Res() response: Response,
-    ): Promise<UpdateResult | undefined> {
-        return await this.pedidoService.update(id, request);
-    }
+  @Put(':id')
+  async putPedido(
+    @Param('id') id: number,
+    @Body() request: PedidoUpdateDTO,
+    @Res() response: Response,
+  ): Promise<UpdateResult | undefined> {
+    return await this.pedidoService.update(id, request);
+  }
 }
