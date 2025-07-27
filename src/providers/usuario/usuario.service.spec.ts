@@ -13,7 +13,7 @@ describe('UsuarioService', () => {
         UsuarioService,
         {
           provide: getRepositoryToken(Usuario),
-          useValue: {}, // Puedes añadir funciones mock aquí
+          useValue: {},
         },
       ],
     }).compile();
