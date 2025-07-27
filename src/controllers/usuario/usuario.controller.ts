@@ -23,6 +23,7 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
+      idTienda: usuario.idTienda // ← ✅ ¡ESTO FALTABA!
     }));
   }
 
@@ -42,8 +43,10 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
+      idTienda: usuario.idTienda 
     };
   }
+
 
   @Post()
   async postUsuario(@Body() request: UsuarioDTO): Promise<IPostUsuarioResponse> {
@@ -92,7 +95,6 @@ export class UsuarioController {
     return usuarioSinContraseña;
   }
 
-  // ✅ NUEVO: Obtener todos los usuarios con un rol específico
   @Get('rol/:rol')
   public async getUsuariosConRol(@Param('rol') rol: string): Promise<IGetUsuarioResponse[]> {
     const usuarios = await this.usuarioService.getUsuariosConRol(rol);
@@ -105,6 +107,7 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
+      idTienda: usuario.idTienda // ✅ AGREGA ESTO TAMBIÉN
     }));
   }
 }

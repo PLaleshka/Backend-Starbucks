@@ -21,14 +21,24 @@ export class PedidoService {
   ) {}
 
   public async getAllPedidos(): Promise<Pedido[]> {
-    return await this.pedidoRepository.find();
+    return await this.pedidoRepository.find({
+      relations: ['cliente', 'barista', 'tienda'],
+      order: { idPedido: 'ASC' }
+    });
   }
 
   public async getPedido(id: number): Promise<Pedido> {
     try {
-      const result = await this.pedidoRepository.createQueryBuilder('pedido')
-        .where('pedido.id_pedido = :id', { id }) // 🔧 Corregido: id_pedido
-        .getOne();
+      const result = await this.pedidoRepository.findOne({
+        where: { idPedido: id },
+        relations: [
+          'cliente',
+          'barista',
+          'tienda',
+          'detallePedidos',
+          'detallePedidos.producto'
+        ]
+      });
 
       if (!result) {
         throw new Error(`Pedido con id ${id} no encontrado`);
@@ -60,7 +70,7 @@ export class PedidoService {
       if (!barista || barista.rol !== 'barista') throw new Error('Barista no encontrado o rol incorrecto');
     }
 
-    pedido.usuario = cliente;
+    pedido.cliente = cliente;
     pedido.tienda = tienda;
     if (barista) pedido.barista = barista;
 
@@ -78,7 +88,7 @@ export class PedidoService {
     if (pedidoDto.cliente) {
       const cliente = await this.usuarioRepository.findOneBy({ idUsuario: pedidoDto.cliente });
       if (!cliente || cliente.rol !== 'cliente') throw new Error('Cliente no encontrado o rol incorrecto');
-      updateData.usuario = cliente;
+      updateData.cliente = cliente;
     }
 
     const result = await this.pedidoRepository.update(id, updateData);

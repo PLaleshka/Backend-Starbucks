@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UsuarioUpdateDTO {
     @IsOptional()
@@ -29,4 +29,8 @@ export class UsuarioUpdateDTO {
     @IsOptional()
     @IsString()
     telefono?: string;
+
+    @IsOptional()
+    @IsNumber()
+    idTienda?: number;
 }
