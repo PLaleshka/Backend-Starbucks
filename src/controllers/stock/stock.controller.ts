@@ -6,7 +6,7 @@ import { Stock } from 'src/controllers/database/entities/stock.entity';
 import { IPutStockRequest } from './dto/IPutStockRequest';
 import { UpdateResult } from 'typeorm';
 
-@Controller('stock')
+@Controller('api/stock')
 export class StockController {
   constructor(private readonly stockService: StockService) {}
 
