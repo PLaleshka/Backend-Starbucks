@@ -72,4 +72,5 @@ export class UsuarioUpdateDTO {
   })
   @IsOptional()
   @IsNumber()
-  idTienda?:
+ idTienda?: number;
+}

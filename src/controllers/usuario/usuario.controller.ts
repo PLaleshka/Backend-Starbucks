@@ -150,11 +150,13 @@ export class UsuarioController {
     }));
   }
 
-  @Get('baristas-disponibles/:idTienda')
+   @Get('baristas-disponibles/:idTienda')
   @ApiOperation({ summary: 'Obtener baristas disponibles por tienda' })
   @ApiParam({ name: 'idTienda', type: Number })
   @ApiResponse({ status: 200, description: 'Lista de baristas disponibles', type: [Usuario] })
   async getBaristasDisponibles(
     @Param('idTienda') idTienda: number
   ): Promise<Usuario[]> {
-    return await
+    return await this.usuarioService.getBaristasDisponiblesPorTienda(idTienda);
+  }
+}

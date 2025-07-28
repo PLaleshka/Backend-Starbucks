@@ -91,8 +91,10 @@ export class LoginService {
   const { contraseña: _, ...usuarioSinContraseña } = usuario;
 
   return {
-    token,
-    usuario: usuarioSinContraseña,
+  status: 'success',
+  access_token: token,
+  token: token,
+  usuario: usuarioSinContraseña,
   };
- }
+  }
 }

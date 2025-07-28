@@ -1,4 +1,4 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, HttpException, Controller } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Pedido } from 'src/controllers/database/entities/pedido.entity';
@@ -11,7 +11,8 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/s
 
 @ApiTags('Pedidos')
 @Injectable()
-export class PedidoService {
+@Controller('api/pedido')
+export class PedidoController {
   constructor(
     @InjectRepository(Pedido)
     private readonly pedidoRepository: Repository<Pedido>,
