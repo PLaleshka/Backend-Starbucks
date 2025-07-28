@@ -1,7 +1,6 @@
-import {IsEmail,IsEnum,IsOptional,IsString, MinLength} from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, MinLength, IsNumber } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
-// Importa desde donde lo tengas o define nuevamente si es necesario
 export enum RolUsuario {
   CLIENTE = 'cliente',
   BARISTA = 'barista',
@@ -72,6 +71,5 @@ export class UsuarioUpdateDTO {
     description: 'ID de la tienda donde trabaja el barista (solo para baristas)',
   })
   @IsOptional()
-  idTienda?: number;
-
-}
+  @IsNumber()
+  idTienda?:

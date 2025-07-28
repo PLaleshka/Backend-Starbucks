@@ -1,120 +1,211 @@
-import { Body, Controller, Get, Param, Post, Put, Res, Delete, NotFoundException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
-import { Response } from 'express';
-import { plainToInstance } from 'class-transformer';
+import { Injectable, HttpException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Pedido } from 'src/controllers/database/entities/pedido.entity';
+import { DetallePedido } from 'src/controllers/database/entities/detalle-pedido.entity';
+import { Usuario } from 'src/controllers/database/entities/usuario.entity';
+import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
+import { PedidoCreateRequestDTO } from 'src/controllers/pedido/dto/PedidoCreateRequestDTO';
+import { PedidoUpdateDTO } from 'src/controllers/pedido/dto/PedidoUpdateDTO';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 
-import { PedidoService } from 'src/providers/pedido/pedido.service';
-import { PedidoDTO } from './dto/pedido.dto';
-import { PedidoUpdateDTO } from './dto/PedidoUpdateDTO';
-import { PedidoResponseDTO } from './dto/PedidoResponseDTO';
-import { IPedidoResponse } from './dto/IGetPedidoResponse';
-import { UpdateResult } from 'typeorm/query-builder/result/UpdateResult';
+@ApiTags('Pedidos')
+@Injectable()
+export class PedidoService {
+  constructor(
+    @InjectRepository(Pedido)
+    private readonly pedidoRepository: Repository<Pedido>,
+    @InjectRepository(DetallePedido)
+    private readonly detallePedidoRepository: Repository<DetallePedido>,
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(TiendaEntity)
+    private readonly tiendaRepository: Repository<TiendaEntity>,
+  ) {}
 
-@ApiTags('Pedido')
-@Controller('pedido')
-export class PedidoController {
-  private pedidos: IPedidoResponse[] = [];
-
-  constructor(private pedidoService: PedidoService) {}
-
-  @Get()
-  @ApiOperation({ summary: 'Obtener todos los pedidos (mocked)' })
-  @ApiResponse({
-    status: 200,
-    description: 'Lista de pedidos en memoria',
-    type: [PedidoResponseDTO],
-  })
-  public getpedidos(): IPedidoResponse[] {
-    return this.pedidos;
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Obtener pedido por ID (mocked)' })
-  @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({
-    status: 200,
-    description: 'Pedido encontrado',
-    type: PedidoResponseDTO,
-  })
-  @ApiResponse({ status: 404, description: 'Pedido no encontrado' })
-  public getpedido(@Param('id') id: number): IPedidoResponse {
-    const pedido = this.pedidos.find((c) => c.idPedido === Number(id));
-    if (!pedido) {
-      throw new NotFoundException(`Pedido con id ${Number(id)} no encontrado`);
-    }
-    return pedido;
-  }
-
-  @Post()
-  @ApiOperation({ summary: 'Crear un nuevo pedido' })
-  @ApiBody({ type: PedidoDTO })
-  @ApiResponse({
-    status: 201,
-    description: 'Pedido creado exitosamente',
-    type: PedidoResponseDTO,
-  })
-  async createPedido(
-    @Body() pedidoDto: PedidoDTO,
-  ): Promise<PedidoResponseDTO> {
-    const pedido = await this.pedidoService.create(pedidoDto);
-    return plainToInstance(PedidoResponseDTO, pedido, {
-      excludeExtraneousValues: true,
+  @ApiOperation({ summary: 'Obtener todos los pedidos' })
+  @ApiResponse({ status: 200, description: 'Lista de pedidos' })
+  public async getAllPedidos(): Promise<Pedido[]> {
+    return await this.pedidoRepository.find({
+      relations: ['cliente', 'barista', 'tienda'],
+      order: { idPedido: 'ASC' }
     });
   }
 
-  @Put(':id')
-  @ApiOperation({ summary: 'Actualizar un pedido existente' })
+  @ApiOperation({ summary: 'Obtener pedido por ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Pedido encontrado' })
+  @ApiResponse({ status: 404, description: 'Pedido no encontrado' })
+  public async getPedido(id: number): Promise<Pedido> {
+    try {
+      const result = await this.pedidoRepository.findOne({
+        where: { idPedido: id },
+        relations: [
+          'cliente',
+          'barista',
+          'tienda',
+          'detallePedidos',
+          'detallePedidos.producto'
+        ]
+      });
+      if (!result) {
+        throw new HttpException('Pedido no encontrado', 404);
+      }
+      return result;
+    } catch (error) {
+      throw new HttpException('Pedido no encontrado', 404);
+    }
+  }
+
+  @ApiOperation({ summary: 'Crear un pedido' })
+  @ApiBody({ type: PedidoCreateRequestDTO })
+  @ApiResponse({ status: 201, description: 'Pedido creado' })
+  async crearPedido(dto: PedidoCreateRequestDTO) {
+    const usuario = await this.usuarioRepository.findOneBy({ idUsuario: dto.id_usuario_cliente });
+    if (!usuario) throw new HttpException('Usuario no encontrado', 404);
+
+    const tienda = await this.tiendaRepository.findOneBy({ idTienda: dto.id_tienda });
+    if (!tienda) throw new HttpException('Tienda no encontrada', 404);
+
+    const barista = await this.usuarioRepository.findOne({
+      where: { rol: 'barista', idTienda: tienda.idTienda },
+    });
+
+    const iva = +(dto.subtotal * 0.16).toFixed(2);
+
+    const pedido = new Pedido();
+    pedido.cliente = usuario;
+    pedido.tienda = tienda;
+    pedido.barista = barista || undefined;
+    pedido.subtotal = dto.subtotal;
+    pedido.iva = iva;
+    pedido.estadoPedido = 'pendiente';
+    pedido.tiempoEstimado = '15';
+    pedido.fecha = new Date();
+
+    const pedidoGuardado = await this.pedidoRepository.save(pedido);
+
+    for (const prod of dto.productos) {
+      const detalle = new DetallePedido();
+      detalle.pedido = pedidoGuardado;
+      detalle.producto = { idProducto: prod.idProducto } as any;
+      detalle.idPedido = pedidoGuardado.idPedido;
+      detalle.idProducto = prod.idProducto;
+      detalle.cantidad = prod.cantidad;
+      detalle.precioUnitario = prod.precioUnitario;
+      detalle.precioTotal = prod.precioTotal;
+      detalle.detallePersonalizacion = prod.detallePersonalizacion ?? null;
+      await this.detallePedidoRepository.save(detalle);
+    }
+
+    // Devuelve el pedido completo con relaciones
+    const pedidoCompleto = await this.pedidoRepository.findOne({
+      where: { idPedido: pedidoGuardado.idPedido },
+      relations: ['cliente', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
+    });
+
+    return pedidoCompleto;
+  }
+
+  @ApiOperation({ summary: 'Actualizar un pedido' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: PedidoUpdateDTO })
-  @ApiResponse({
-    status: 200,
-    description: 'Pedido actualizado exitosamente',
-    type: PedidoResponseDTO,
-  })
-  @ApiResponse({ status: 404, description: 'Pedido no encontrado' })
-  async putpedido(
-    @Param('id') id: number,
-    @Body() request: PedidoUpdateDTO,
-  ): Promise<PedidoResponseDTO> {
-    const result = await this.pedidoService.update(id, request);
+  @ApiResponse({ status: 200, description: 'Pedido actualizado' })
+  async update(id: number, data: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
+    const updateData: any = { ...data };
 
-    if (!result) {
-      throw new NotFoundException(`No se encontró pedido con ID ${id}`);
+    // Si se quiere actualizar el cliente y viene como número (ID)
+    if (updateData.cliente && typeof updateData.cliente === 'number') {
+      const cliente = await this.usuarioRepository.findOneBy({ idUsuario: updateData.cliente });
+      if (!cliente || cliente.rol !== 'cliente') {
+        throw new HttpException('Cliente no encontrado o rol incorrecto', 404);
+      }
+      updateData.cliente = cliente;
     }
 
-    // Opcional: traer el pedido actualizado para devolverlo al frontend
-    const pedidoActualizado = await this.pedidoService.getPedido(id);
-    return plainToInstance(PedidoResponseDTO, pedidoActualizado, {
-      excludeExtraneousValues: true,
+    // Si se quiere actualizar la tienda y viene como número (ID)
+    if (updateData.tienda && typeof updateData.tienda === 'number') {
+      const tienda = await this.tiendaRepository.findOneBy({ idTienda: updateData.tienda });
+      if (!tienda) {
+        throw new HttpException('Tienda no encontrada', 404);
+      }
+      updateData.tienda = tienda;
+    }
+
+    const result = await this.pedidoRepository.update(id, updateData);
+    return result.affected === 0 ? undefined : result;
+  }
+
+  @ApiOperation({ summary: 'Obtener pedidos por usuario' })
+  @ApiParam({ name: 'idUsuario', type: Number })
+  @ApiResponse({ status: 200, description: 'Pedidos del usuario' })
+  public async getPedidosPorUsuario(idUsuario: number): Promise<Pedido[]> {
+    const usuario = await this.usuarioRepository.findOne({
+      where: { idUsuario },
+    });
+
+    if (!usuario) {
+      throw new HttpException('Usuario no encontrado', 404);
+    }
+
+    const pedidos = await this.pedidoRepository.find({
+      where: { cliente: { idUsuario } },
+      relations: ['cliente', 'barista', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
+      order: { idPedido: 'DESC' }
+    });
+
+    if (!pedidos || pedidos.length === 0) {
+      throw new HttpException('No se encontraron pedidos para este usuario', 404);
+    }
+
+    return pedidos;
+  }
+
+  @ApiOperation({ summary: 'Obtener pedidos por tienda' })
+  @ApiParam({ name: 'idTienda', type: Number })
+  @ApiResponse({ status: 200, description: 'Pedidos de la tienda' })
+  public async getPedidosPorTienda(idTienda: number): Promise<Pedido[]> {
+    const tienda = await this.tiendaRepository.findOne({
+      where: { idTienda }
+    });
+
+    if (!tienda) {
+      throw new HttpException('Tienda no encontrada', 404);
+    }
+
+    const pedidos = await this.pedidoRepository.find({
+      where: { tienda: { idTienda } },
+      relations: ['cliente', 'barista', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
+      order: { idPedido: 'DESC' }
+    });
+
+    if (!pedidos || pedidos.length === 0) {
+      throw new HttpException('No se encontraron pedidos para esta tienda', 404);
+    }
+
+    return pedidos;
+  }
+
+  @ApiOperation({ summary: 'Buscar pedido por ID (alternativo)' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Pedido encontrado' })
+  async findById(id: number): Promise<Pedido | null> {
+    return await this.pedidoRepository.findOne({
+      where: { idPedido: id },
+      relations: [
+        'cliente',
+        'barista',
+        'tienda',
+        'detallePedidos',
+        'detallePedidos.producto'
+      ]
     });
   }
 
-
-  @Delete(':id')
-  @ApiOperation({ summary: 'Eliminar pedido de la lista en memoria (mocked)' })
+  @ApiOperation({ summary: 'Eliminar pedido' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Pedido eliminado correctamente' })
-  @ApiResponse({ status: 404, description: 'Pedido no encontrado' })
-  async deletepedido(
-    @Param('id') id: number,
-    @Res() response: Response,
-  ): Promise<Response> {
-    if (isNaN(id)) return response.status(400).send();
-
-    let isPedidoFound = false;
-    this.pedidos = this.pedidos.filter((pedido) => {
-      if (pedido.idPedido === id) {
-        isPedidoFound = true;
-        return false;
-      }
-      return true;
-    });
-
-    if (!isPedidoFound) {
-      return response.status(404).send();
-    }
-
-    return response.status(200).send({ message: 'Pedido eliminado correctamente' });
+  @ApiResponse({ status: 200, description: 'Pedido eliminado' })
+  async delete(id: number): Promise<DeleteResult | undefined> {
+    return await this.pedidoRepository.delete(id);
   }
 }
-

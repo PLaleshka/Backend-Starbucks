@@ -1,4 +1,4 @@
-import {Body,Controller,Delete,Get,Param,Post,Put, UseGuards} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { UsuarioService } from 'src/providers/usuario/usuario.service';
 import { UsuarioDTO } from './dto/Usuario.dto';
 import { UsuarioUpdateDTO } from './dto/UsuarioUpdateDTO';
@@ -7,11 +7,10 @@ import { IPostUsuarioResponse } from './dto/IPostUsuarioResponse';
 import { IPutUsuarioResponse } from './dto/IPutUsuarioResponse';
 import { Usuario } from '../database/entities/usuario.entity';
 import { UpdateResult } from 'typeorm';
-import {ApiTags,ApiOperation,ApiResponse,ApiParam,ApiBody, } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Usuario')
-@Controller('usuario')
+@Controller('api/usuario')
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
@@ -28,7 +27,9 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
-      disponibilidad: usuario.disponibilidad
+      idTienda: usuario.idTienda,
+      telefono: usuario.telefono,
+      disponibilidad: usuario.disponibilidad,
     }));
   }
 
@@ -42,7 +43,6 @@ export class UsuarioController {
     if (!usuario) {
       throw new Error(`Usuario con id ${id} no encontrado`);
     }
-
     return {
       idUsuario: usuario.idUsuario,
       nombre: usuario.nombre,
@@ -51,7 +51,9 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
-      disponibilidad: usuario.disponibilidad
+      idTienda: usuario.idTienda,
+      telefono: usuario.telefono,
+      disponibilidad: usuario.disponibilidad,
     };
   }
 
@@ -76,14 +78,13 @@ export class UsuarioController {
   @ApiOperation({ summary: 'Actualizar un usuario por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UsuarioUpdateDTO })
-  @ApiResponse({ status: 200, description: 'Usuario actualizado correctamente'})
+  @ApiResponse({ status: 200, description: 'Usuario actualizado correctamente' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   async putUsuario(@Param('id') id: number, @Body() request: UsuarioUpdateDTO): Promise<IPutUsuarioResponse> {
     const result: UpdateResult | undefined = await this.usuarioService.update(id, request);
     if (!result) {
       throw new Error(`No se encontró usuario con id ${id} para actualizar`);
     }
-
     return {
       data: null,
       statusCode: 200,
@@ -125,9 +126,28 @@ export class UsuarioController {
     if (!usuario) {
       throw new Error('Correo o contraseña incorrectos');
     }
-
     const { contraseña, ...usuarioSinContraseña } = usuario;
     return usuarioSinContraseña;
+  }
+
+  @Get('rol/:rol')
+  @ApiOperation({ summary: 'Obtener usuarios por rol' })
+  @ApiParam({ name: 'rol', type: String })
+  @ApiResponse({ status: 200, description: 'Lista de usuarios con el rol especificado', type: [Usuario] })
+  public async getUsuariosConRol(@Param('rol') rol: string): Promise<IGetUsuarioResponse[]> {
+    const usuarios = await this.usuarioService.getUsuariosConRol(rol);
+    return usuarios.map((usuario) => ({
+      idUsuario: usuario.idUsuario,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      numeroCelular: usuario.numeroCelular ?? '',
+      correoElectronico: usuario.correoElectronico,
+      contraseña: usuario.contraseña,
+      rol: usuario.rol,
+      idTienda: usuario.idTienda,
+      telefono: usuario.telefono,
+      disponibilidad: usuario.disponibilidad,
+    }));
   }
 
   @Get('baristas-disponibles/:idTienda')
@@ -137,9 +157,4 @@ export class UsuarioController {
   async getBaristasDisponibles(
     @Param('idTienda') idTienda: number
   ): Promise<Usuario[]> {
-    return await this.usuarioService.getBaristasDisponiblesPorTienda(idTienda);
-  }
-
-
-
-}
+    return await

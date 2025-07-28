@@ -8,6 +8,7 @@ import { UpdateResult } from 'typeorm';
 import {ApiTags,ApiOperation,ApiResponse,ApiParam,ApiBody,ApiBearerAuth} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/controllers/auth/jwt-auth.guard';
 
+@Controller('api/stock')
 @ApiTags('Stock')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)

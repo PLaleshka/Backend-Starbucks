@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Usuario } from 'src/controllers/database/entities/usuario.entity';
 
 export class LoginResponseDTO {
   @ApiProperty({
@@ -12,4 +13,8 @@ export class LoginResponseDTO {
     description: 'Token JWT generado al iniciar sesión',
   })
   access_token!: string;
+
+  token!: string;
+  usuario!: Partial<Usuario>;
 }
+

@@ -21,19 +21,16 @@ export class UsuarioService {
   }
 
   public async getUsuarioById(id: number): Promise<Usuario> {
-    try {
-      const result = await this.usuarioRepository.createQueryBuilder('usuario')
-        .where('usuario.idusuario = :id', { id })
-        .getOne();
+    const result = await this.usuarioRepository
+      .createQueryBuilder('usuario')
+      .where('usuario.idusuario = :id', { id })
+      .getOne();
 
-      if (!result) {
-        throw new Error(`Usuario con id ${id} no encontrado`);
-      }
-
-      return result;
-    } catch (error: any) {
-      throw new Error(error);
+    if (!result) {
+      throw new Error(`Usuario con id ${id} no encontrado`);
     }
+
+    return result;
   }
 
   public async create(usuario: Usuario): Promise<Usuario> {
@@ -41,7 +38,7 @@ export class UsuarioService {
     const hashedPassword = await bcrypt.hash(usuario.contraseña, 10);
     const nuevoUsuario = this.usuarioRepository.create({
       ...usuario,
-      contraseña: hashedPassword
+      contraseña: hashedPassword,
     });
 
     return await this.usuarioRepository.save(nuevoUsuario);
@@ -86,7 +83,12 @@ export class UsuarioService {
     return usuario;
   }
 
-  // src/providers/usuario/usuario.service.ts
+  public async getUsuariosConRol(rol: string): Promise<Usuario[]> {
+    return await this.usuarioRepository
+      .createQueryBuilder('usuario')
+      .where('LOWER(usuario.rol) = :rol', { rol: rol.toLowerCase() })
+      .getMany();
+  }
 
   public async getBaristasDisponiblesPorTienda(idTienda: number): Promise<Usuario[]> {
     return await this.usuarioRepository.find({
@@ -98,6 +100,4 @@ export class UsuarioService {
       relations: ['tiendaTrabajo']
     });
   }
-
-
 }

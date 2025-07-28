@@ -1,7 +1,11 @@
-import { Expose, Type } from 'class-transformer';
+import { UsuarioResponseDTO } from '../../usuario/dto/UsuarioResponseDTO';
+import { TiendaResponseDTO } from '../../tienda/dto/TiendaResponseDTO';
+import { DetallePedidoResponseDTO } from '../../detalle-pedido/dto/DetallePedidoResponseDTO';
 import { DetallePedido } from '../../database/entities/detalle-pedido.entity';
 import { TiendaEntity } from '../../database/entities/tienda.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
+
 
 export class PedidoResponseDTO {
   @ApiProperty({ example: 1, description: 'ID único del pedido' })
@@ -43,12 +47,14 @@ export class PedidoResponseDTO {
     },
   })
   @Expose()
-  cliente: any; // Idealmente usa un DTO o entidad decorada
+  @Type(() => UsuarioResponseDTO)
+  cliente!: UsuarioResponseDTO;
+
 
   @ApiProperty({ type: () => TiendaEntity, description: 'Tienda asignada al pedido' })
   @Expose()
-  @Type(() => TiendaEntity)
-  tienda!: TiendaEntity;
+  @Type(() => TiendaResponseDTO)
+  tienda!: TiendaResponseDTO;
 
   @ApiProperty({
     type: () => DetallePedido,
@@ -56,6 +62,6 @@ export class PedidoResponseDTO {
     description: 'Lista de productos y configuraciones asociadas al pedido',
   })
   @Expose()
-  @Type(() => DetallePedido)
-  detallePedidos!: DetallePedido[];
+  @Type(() => DetallePedidoResponseDTO)
+  detallePedidos!: DetallePedidoResponseDTO[];
 }
