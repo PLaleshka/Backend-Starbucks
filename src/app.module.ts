@@ -44,15 +44,16 @@ import { ProductoOpcionController } from './controllers/producto-opcion/producto
 import { OpcionPersonalizacionController } from './controllers/opcion-personalizacion/opcion-personalizacion.controller';
 import { OpcionPersonalizacionService } from './providers/opcion-personalizacion/opcion.personalizacion.service';
 import { ProductoOpcionService } from './providers/producto-opcion/producto-opcion.service';
+import { AuthModule } from './controllers/auth/auth.module';
 
 @Module({
   imports: [
-    // 📦 Config .env global
+    // Config .env global
     ConfigModule.forRoot({
       isGlobal: true,
     }),
 
-    // 🔐 JWT
+    // JWT
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -64,7 +65,7 @@ import { ProductoOpcionService } from './providers/producto-opcion/producto-opci
       inject: [ConfigService],
     }),
 
-    // 🗄️ TypeORM config
+    // TypeORM config
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -84,7 +85,7 @@ import { ProductoOpcionService } from './providers/producto-opcion/producto-opci
       inject: [ConfigService],
     }),
 
-    // 📦 Repositorios disponibles para inyección
+    // Repositorios disponibles para inyección
     TypeOrmModule.forFeature([
       Usuario, Pedido, TiendaEntity, Producto,
       DetallePedido, Ingrediente, Inventario, Receta, Stock, ProductoOpcion, 
@@ -92,6 +93,7 @@ import { ProductoOpcionService } from './providers/producto-opcion/producto-opci
     ]),
 
     ControllersModule,
+    AuthModule
   ],
 
   controllers: [

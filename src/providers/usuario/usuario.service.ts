@@ -4,12 +4,16 @@ import { Repository, UpdateResult } from 'typeorm';
 import { Usuario } from 'src/controllers/database/entities/usuario.entity';
 import { UsuarioUpdateDTO } from 'src/controllers/usuario/dto/UsuarioUpdateDTO';
 import * as bcrypt from 'bcrypt';
+import { TiendaEntity } from 'src/controllers/database/entities/tienda.entity';
 
 @Injectable()
 export class UsuarioService {
   constructor(
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
+
+    @InjectRepository(TiendaEntity)
+    private readonly tiendaRepository: Repository<TiendaEntity>
   ) {}
 
   public async getAllUsuarios(): Promise<Usuario[]> {
@@ -17,23 +21,20 @@ export class UsuarioService {
   }
 
   public async getUsuarioById(id: number): Promise<Usuario> {
-    try {
-      const result = await this.usuarioRepository
-        .createQueryBuilder('usuario')
-        .where('usuario.idusuario = :id', { id })
-        .getOne();
+    const result = await this.usuarioRepository
+      .createQueryBuilder('usuario')
+      .where('usuario.idusuario = :id', { id })
+      .getOne();
 
-      if (!result) {
-        throw new Error(`Usuario con id ${id} no encontrado`);
-      }
-
-      return result;
-    } catch (error: any) {
-      throw new Error(error);
+    if (!result) {
+      throw new Error(`Usuario con id ${id} no encontrado`);
     }
+
+    return result;
   }
 
   public async create(usuario: Usuario): Promise<Usuario> {
+    // Encriptar la contraseña antes de guardar
     const hashedPassword = await bcrypt.hash(usuario.contraseña, 10);
     const nuevoUsuario = this.usuarioRepository.create({
       ...usuario,
@@ -43,9 +44,17 @@ export class UsuarioService {
     return await this.usuarioRepository.save(nuevoUsuario);
   }
 
-  public async update(id: number, usuario: UsuarioUpdateDTO): Promise<UpdateResult | undefined> {
-    const result: UpdateResult = await this.usuarioRepository.update(id, usuario);
+  public async update(id: number, dto: UsuarioUpdateDTO): Promise<UpdateResult | undefined> {
+    const updateData: Partial<Usuario> = { ...dto };
 
+    // Si se va a asignar una tienda
+    if (dto.idTienda) {
+      const tienda = await this.tiendaRepository.findOneBy({ idTienda: dto.idTienda });
+      if (!tienda) throw new Error('Tienda no encontrada');
+      updateData.tiendaTrabajo = tienda;
+    }
+
+    const result = await this.usuarioRepository.update(id, updateData);
     if (result.affected === 0) {
       return undefined;
     }
@@ -58,6 +67,7 @@ export class UsuarioService {
     return result.affected !== 0;
   }
 
+  // Método seguro para login con bcrypt
   public async login(correoElectronico: string, contrasena: string): Promise<Usuario | null> {
     const usuario = await this.usuarioRepository.findOne({ where: { correoElectronico } });
 
@@ -74,10 +84,20 @@ export class UsuarioService {
   }
 
   public async getUsuariosConRol(rol: string): Promise<Usuario[]> {
-  return await this.usuarioRepository
-    .createQueryBuilder('usuario')
-    .where('LOWER(usuario.rol) = :rol', { rol: rol.toLowerCase() })
-    .getMany();
-}
+    return await this.usuarioRepository
+      .createQueryBuilder('usuario')
+      .where('LOWER(usuario.rol) = :rol', { rol: rol.toLowerCase() })
+      .getMany();
+  }
 
+  public async getBaristasDisponiblesPorTienda(idTienda: number): Promise<Usuario[]> {
+    return await this.usuarioRepository.find({
+      where: {
+        rol: 'barista',
+        disponibilidad: 'disponible',
+        tiendaTrabajo: { idTienda }
+      },
+      relations: ['tiendaTrabajo']
+    });
+  }
 }

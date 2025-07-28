@@ -2,33 +2,39 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  IsStrongPassword
+  IsStrongPassword,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterRequestDTO {
-    @IsNotEmpty()
-    @IsString()
-    nombre!: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  nombre!: string;
 
-    @IsNotEmpty()
-    @IsString()
-    apellido!: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  apellido!: string;
 
-    @IsNotEmpty()
-    @IsString()
-    numeroCelular!: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  numeroCelular!: string;
 
-    @IsNotEmpty()
-    @IsEmail()
-    correoElectronico!: string;
+  @ApiProperty({ example: 'cliente@gmail.com' })
+  @IsNotEmpty()
+  @IsEmail()
+  correoElectronico!: string;
 
-    @IsNotEmpty()
-    @IsStrongPassword({
-        minLength: 6,
-        minUppercase: 1,
-        minLowercase: 1,
-        minNumbers: 1,
-        minSymbols: 0,
-    })
-    contraseña!: string;
+  @ApiProperty({ example: 'Cliente123' })
+  @IsNotEmpty()
+  @IsStrongPassword({
+    minLength: 6,
+    minUppercase: 1,
+    minLowercase: 1,
+    minNumbers: 1,
+    minSymbols: 0,
+  })
+  contraseña!: string;
 }

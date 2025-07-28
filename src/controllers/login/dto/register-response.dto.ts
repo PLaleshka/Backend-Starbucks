@@ -1,3 +1,9 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class RegisterResponseDTO {
-    status!: string;
+  @ApiProperty({
+    example: 'success',
+    description: 'Estado del registro (por ejemplo: success o error)',
+  })
+  status!: string;
 }

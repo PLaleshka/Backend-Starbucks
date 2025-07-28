@@ -21,7 +21,7 @@ export class PedidoService {
     private readonly tiendaRepository: Repository<TiendaEntity>,
   ) {}
 
-  // GET ALL pedidos
+  // Obtener todos los pedidos
   public async getAllPedidos(): Promise<Pedido[]> {
     return await this.pedidoRepository.find({
       relations: ['cliente', 'barista', 'tienda'],
@@ -29,30 +29,26 @@ export class PedidoService {
     });
   }
 
-  // GET pedido por ID
+  // Obtener pedido por ID
   public async getPedido(id: number): Promise<Pedido> {
-    try {
-      const result = await this.pedidoRepository.findOne({
-        where: { idPedido: id },
-        relations: [
-          'cliente',
-          'barista',
-          'tienda',
-          'detallePedidos',
-          'detallePedidos.producto'
-        ]
-      });
-      if (!result) {
-        throw new HttpException('Pedido no encontrado', 404);
-      }
-      return result;
-    } catch (error) {
+    const result = await this.pedidoRepository.findOne({
+      where: { idPedido: id },
+      relations: [
+        'cliente',
+        'barista',
+        'tienda',
+        'detallePedidos',
+        'detallePedidos.producto'
+      ]
+    });
+    if (!result) {
       throw new HttpException('Pedido no encontrado', 404);
     }
+    return result;
   }
 
-  // CREAR pedido
-  async crearPedido(dto: PedidoCreateRequestDTO) {
+  // Crear pedido
+  async crearPedido(dto: PedidoCreateRequestDTO): Promise<Pedido> {
     const usuario = await this.usuarioRepository.findOneBy({ idUsuario: dto.id_usuario_cliente });
     if (!usuario) throw new HttpException('Usuario no encontrado', 404);
 
@@ -62,8 +58,6 @@ export class PedidoService {
     const barista = await this.usuarioRepository.findOne({
       where: { rol: 'barista', idTienda: tienda.idTienda },
     });
-
-
 
     const iva = +(dto.subtotal * 0.16).toFixed(2);
 
@@ -94,101 +88,101 @@ export class PedidoService {
 
     // Devuelve el pedido completo con relaciones
     const pedidoCompleto = await this.pedidoRepository.findOne({
-    where: { idPedido: pedidoGuardado.idPedido },
-    relations: ['cliente', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
-  });
-    const detalles = await this.detallePedidoRepository.find({
       where: { idPedido: pedidoGuardado.idPedido },
+      relations: ['cliente', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
     });
 
-    return pedidoCompleto;
+    return pedidoCompleto!;
   }
 
-async update(id: number, data: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
-  const updateData: any = { ...data };
+  // Actualizar pedido
+  async update(id: number, data: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
+    const updateData: any = { ...data };
 
-  // Si se quiere actualizar el cliente y viene como número (ID)
-  if (updateData.cliente && typeof updateData.cliente === 'number') {
-    const cliente = await this.usuarioRepository.findOneBy({ idUsuario: updateData.cliente });
-    if (!cliente || cliente.rol !== 'cliente') {
-      throw new HttpException('Cliente no encontrado o rol incorrecto', 404);
+    // Si se quiere actualizar el cliente y viene como número (ID)
+    if (updateData.cliente && typeof updateData.cliente === 'number') {
+      const cliente = await this.usuarioRepository.findOneBy({ idUsuario: updateData.cliente });
+      if (!cliente || cliente.rol !== 'cliente') {
+        throw new HttpException('Cliente no encontrado o rol incorrecto', 404);
+      }
+      updateData.cliente = cliente;
     }
-    updateData.cliente = cliente;
+
+    // Si se quiere actualizar la tienda y viene como número (ID)
+    if (updateData.tienda && typeof updateData.tienda === 'number') {
+      const tienda = await this.tiendaRepository.findOneBy({ idTienda: updateData.tienda });
+      if (!tienda) {
+        throw new HttpException('Tienda no encontrada', 404);
+      }
+      updateData.tienda = tienda;
+    }
+
+    const result = await this.pedidoRepository.update(id, updateData);
+    return result.affected === 0 ? undefined : result;
   }
 
-  // Si se quiere actualizar la tienda y viene como número (ID)
-  if (updateData.tienda && typeof updateData.tienda === 'number') {
-    const tienda = await this.tiendaRepository.findOneBy({ idTienda: updateData.tienda });
+  // Obtener pedidos por usuario
+  public async getPedidosPorUsuario(idUsuario: number): Promise<Pedido[]> {
+    const usuario = await this.usuarioRepository.findOne({
+      where: { idUsuario },
+    });
+
+    if (!usuario) {
+      throw new HttpException('Usuario no encontrado', 404);
+    }
+
+    const pedidos = await this.pedidoRepository.find({
+      where: { cliente: { idUsuario } },
+      relations: ['cliente', 'barista', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
+      order: { idPedido: 'DESC' }
+    });
+
+    if (!pedidos || pedidos.length === 0) {
+      throw new HttpException('No se encontraron pedidos para este usuario', 404);
+    }
+
+    return pedidos;
+  }
+
+  // Obtener pedidos por tienda
+  public async getPedidosPorTienda(idTienda: number): Promise<Pedido[]> {
+    const tienda = await this.tiendaRepository.findOne({
+      where: { idTienda }
+    });
+
     if (!tienda) {
       throw new HttpException('Tienda no encontrada', 404);
     }
-    updateData.tienda = tienda;
+
+    const pedidos = await this.pedidoRepository.find({
+      where: { tienda: { idTienda } },
+      relations: ['cliente', 'barista', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
+      order: { idPedido: 'DESC' }
+    });
+
+    if (!pedidos || pedidos.length === 0) {
+      throw new HttpException('No se encontraron pedidos para esta tienda', 404);
+    }
+
+    return pedidos;
   }
 
-  const result = await this.pedidoRepository.update(id, updateData);
-  return result.affected === 0 ? undefined : result;
-}
-
-
-  public async getPedidosPorUsuario(idUsuario: number): Promise<Pedido[]> {
-  const usuario = await this.usuarioRepository.findOne({
-    where: { idUsuario },
-  });
-
-  if (!usuario) {
-    throw new HttpException('Usuario no encontrado', 404);
-  }
-
-  const pedidos = await this.pedidoRepository.find({
-    where: { cliente: { idUsuario } },
-    relations: ['cliente', 'barista', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
-    order: { idPedido: 'DESC' }
-  });
-
-  if (!pedidos || pedidos.length === 0) {
-    throw new HttpException('No se encontraron pedidos para este usuario', 404);
-  }
-
-  return pedidos;
-}
-
-public async getPedidosPorTienda(idTienda: number): Promise<Pedido[]> {
-  const tienda = await this.tiendaRepository.findOne({
-    where: { idTienda }
-  });
-
-  if (!tienda) {
-    throw new HttpException('Tienda no encontrada', 404);
-  }
-
-  const pedidos = await this.pedidoRepository.find({
-    where: { tienda: { idTienda } },
-    relations: ['cliente', 'barista', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
-    order: { idPedido: 'DESC' }
-  });
-
-  if (!pedidos || pedidos.length === 0) {
-    throw new HttpException('No se encontraron pedidos para esta tienda', 404);
-  }
-
-  return pedidos;
-  }
-
+  // Buscar pedido por ID (para DTOs)
   async findById(id: number): Promise<Pedido | null> {
-  return await this.pedidoRepository.findOne({
-    where: { idPedido: id },
-    relations: [
-      'cliente',
-      'barista',
-      'tienda',
-      'detallePedidos',
-      'detallePedidos.producto'
-    ]
-  });
+    return await this.pedidoRepository.findOne({
+      where: { idPedido: id },
+      relations: [
+        'cliente',
+        'barista',
+        'tienda',
+        'detallePedidos',
+        'detallePedidos.producto'
+      ]
+    });
   }
 
+  // Eliminar pedido
   async delete(id: number): Promise<DeleteResult | undefined> {
-  return await this.pedidoRepository.delete(id);
-}
-
+    return await this.pedidoRepository.delete(id);
+  }
 }
