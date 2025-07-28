@@ -14,7 +14,6 @@ export class LoginResponseDTO {
   })
   access_token!: string;
 
-  token!: string;
   usuario!: Partial<Usuario>;
 }
 

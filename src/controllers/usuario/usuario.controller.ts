@@ -157,4 +157,6 @@ export class UsuarioController {
   async getBaristasDisponibles(
     @Param('idTienda') idTienda: number
   ): Promise<Usuario[]> {
-    return await
+    return await this.usuarioService.getBaristasDisponiblesPorTienda(idTienda);
+  }
+}

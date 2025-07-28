@@ -91,8 +91,9 @@ export class LoginService {
   const { contraseña: _, ...usuarioSinContraseña } = usuario;
 
   return {
-    token,
-    usuario: usuarioSinContraseña,
-  };
+  status: 'Login exitoso',
+  access_token: token,
+  usuario: usuarioSinContraseña,
+};
  }
 }
