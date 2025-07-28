@@ -30,8 +30,9 @@ export class Usuario {
   numeroCelular?: string;
 
   // CLIENTE: pedidos realizados
-  @OneToMany(() => Pedido, pedido => pedido.usuario)
+  @OneToMany(() => Pedido, pedido => pedido.cliente)
   pedidos?: Pedido[];
+  
 
   @OneToMany(() => Pedido, pedido => pedido.barista)
   pedidosAtendidos?: Pedido[]; // barista

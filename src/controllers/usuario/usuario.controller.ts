@@ -8,14 +8,13 @@ import { IPutUsuarioResponse } from './dto/IPutUsuarioResponse';
 import { Usuario } from '../database/entities/usuario.entity';
 import { UpdateResult } from 'typeorm';
 
-@Controller('usuario')
+@Controller('api/usuario')
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
   @Get()
   public async getUsuarios(): Promise<IGetUsuarioResponse[]> {
     const usuarios = await this.usuarioService.getAllUsuarios();
-
     return usuarios.map((usuario) => ({
       idUsuario: usuario.idUsuario,
       nombre: usuario.nombre,
@@ -24,6 +23,7 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
+      idTienda: usuario.idTienda 
     }));
   }
 
@@ -43,8 +43,10 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
+      idTienda: usuario.idTienda 
     };
   }
+
 
   @Post()
   async postUsuario(@Body() request: UsuarioDTO): Promise<IPostUsuarioResponse> {
@@ -58,7 +60,6 @@ export class UsuarioController {
       statusCode: 200,
       statusDescription: 'Usuario creado correctamente',
       errors: []
-
     };
   }
 
@@ -75,7 +76,6 @@ export class UsuarioController {
       statusCode: 200,
       statusDescription: 'Usuario actualizado correctamente',
       errors: []
-
     };
   }
 
@@ -84,18 +84,30 @@ export class UsuarioController {
     return this.usuarioService.delete(id);
   }
 
-  // ✅ NUEVO: LOGIN
   @Post('login')
-  async login(
-    @Body() datos: { correoElectronico: string; contraseña: string }
-  ): Promise<Omit<Usuario, 'contraseña'>> {
+  async login(@Body() datos: { correoElectronico: string; contraseña: string }): Promise<Omit<Usuario, 'contraseña'>> {
     const usuario = await this.usuarioService.login(datos.correoElectronico, datos.contraseña);
-
     if (!usuario) {
       throw new Error('Correo o contraseña incorrectos');
     }
 
     const { contraseña, ...usuarioSinContraseña } = usuario;
     return usuarioSinContraseña;
+  }
+
+  @Get('rol/:rol')
+  public async getUsuariosConRol(@Param('rol') rol: string): Promise<IGetUsuarioResponse[]> {
+    const usuarios = await this.usuarioService.getUsuariosConRol(rol);
+
+    return usuarios.map((usuario) => ({
+      idUsuario: usuario.idUsuario,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      numeroCelular: usuario.numeroCelular ?? '',
+      correoElectronico: usuario.correoElectronico,
+      contraseña: usuario.contraseña,
+      rol: usuario.rol,
+      idTienda: usuario.idTienda 
+    }));
   }
 }
