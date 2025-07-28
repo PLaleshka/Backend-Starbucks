@@ -1,4 +1,4 @@
-import { Injectable, HttpException, Controller } from '@nestjs/common';
+import { Injectable, HttpException, Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Pedido } from 'src/controllers/database/entities/pedido.entity';
@@ -24,6 +24,7 @@ export class PedidoController {
     private readonly tiendaRepository: Repository<TiendaEntity>,
   ) {}
 
+  @Get()
   @ApiOperation({ summary: 'Obtener todos los pedidos' })
   @ApiResponse({ status: 200, description: 'Lista de pedidos' })
   public async getAllPedidos(): Promise<Pedido[]> {
@@ -33,11 +34,12 @@ export class PedidoController {
     });
   }
 
+  @Get(':id')
   @ApiOperation({ summary: 'Obtener pedido por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Pedido encontrado' })
   @ApiResponse({ status: 404, description: 'Pedido no encontrado' })
-  public async getPedido(id: number): Promise<Pedido> {
+  public async getPedido(@Param('id', ParseIntPipe) id: number): Promise<Pedido> {
     try {
       const result = await this.pedidoRepository.findOne({
         where: { idPedido: id },
@@ -58,10 +60,11 @@ export class PedidoController {
     }
   }
 
+  @Post()
   @ApiOperation({ summary: 'Crear un pedido' })
   @ApiBody({ type: PedidoCreateRequestDTO })
   @ApiResponse({ status: 201, description: 'Pedido creado' })
-  async crearPedido(dto: PedidoCreateRequestDTO) {
+  async crearPedido(@Body() dto: PedidoCreateRequestDTO) {
     const usuario = await this.usuarioRepository.findOneBy({ idUsuario: dto.id_usuario_cliente });
     if (!usuario) throw new HttpException('Usuario no encontrado', 404);
 
@@ -108,11 +111,12 @@ export class PedidoController {
     return pedidoCompleto;
   }
 
+  @Put(':id')
   @ApiOperation({ summary: 'Actualizar un pedido' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: PedidoUpdateDTO })
   @ApiResponse({ status: 200, description: 'Pedido actualizado' })
-  async update(id: number, data: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() data: PedidoUpdateDTO): Promise<UpdateResult | undefined> {
     const updateData: any = { ...data };
 
     // Si se quiere actualizar el cliente y viene como número (ID)
@@ -137,10 +141,11 @@ export class PedidoController {
     return result.affected === 0 ? undefined : result;
   }
 
+  @Get('usuario/:idUsuario')
   @ApiOperation({ summary: 'Obtener pedidos por usuario' })
   @ApiParam({ name: 'idUsuario', type: Number })
   @ApiResponse({ status: 200, description: 'Pedidos del usuario' })
-  public async getPedidosPorUsuario(idUsuario: number): Promise<Pedido[]> {
+  public async getPedidosPorUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number): Promise<Pedido[]> {
     const usuario = await this.usuarioRepository.findOne({
       where: { idUsuario },
     });
@@ -162,10 +167,11 @@ export class PedidoController {
     return pedidos;
   }
 
+  @Get('tienda/:idTienda')
   @ApiOperation({ summary: 'Obtener pedidos por tienda' })
   @ApiParam({ name: 'idTienda', type: Number })
   @ApiResponse({ status: 200, description: 'Pedidos de la tienda' })
-  public async getPedidosPorTienda(idTienda: number): Promise<Pedido[]> {
+  public async getPedidosPorTienda(@Param('idTienda', ParseIntPipe) idTienda: number): Promise<Pedido[]> {
     const tienda = await this.tiendaRepository.findOne({
       where: { idTienda }
     });
@@ -187,10 +193,11 @@ export class PedidoController {
     return pedidos;
   }
 
+  @Get('find/:id')
   @ApiOperation({ summary: 'Buscar pedido por ID (alternativo)' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Pedido encontrado' })
-  async findById(id: number): Promise<Pedido | null> {
+  async findById(@Param('id', ParseIntPipe) id: number): Promise<Pedido | null> {
     return await this.pedidoRepository.findOne({
       where: { idPedido: id },
       relations: [
@@ -203,10 +210,11 @@ export class PedidoController {
     });
   }
 
+  @Delete(':id')
   @ApiOperation({ summary: 'Eliminar pedido' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Pedido eliminado' })
-  async delete(id: number): Promise<DeleteResult | undefined> {
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult | undefined> {
     return await this.pedidoRepository.delete(id);
   }
 }

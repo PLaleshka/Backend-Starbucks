@@ -4,9 +4,10 @@ import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
 import { join } from 'path';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // CORS para permitir acceso desde Angular
   app.enableCors({
@@ -23,7 +24,7 @@ async function bootstrap() {
   );
 
   // Prefijo global para rutas
-  app.setGlobalPrefix('api');
+ // app.setGlobalPrefix('api');
 
   // Swagger config
   const config = new DocumentBuilder()
@@ -35,6 +36,12 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document); // http://localhost:3000/api/docs
+
+  
+
+   app.useStaticAssets(join(__dirname, '..', 'public/images'), {
+    prefix: '/images/',
+    });
 
   await app.listen(3000);
 }

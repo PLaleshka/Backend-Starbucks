@@ -13,7 +13,7 @@ import {ApiTags,ApiOperation,ApiResponse,ApiBody,ApiParam,ApiBearerAuth} from '@
 import { JwtAuthGuard } from 'src/controllers/auth/jwt-auth.guard';
 
 @ApiTags('Tienda')
-@Controller('tienda')
+@Controller('api/tienda')
 export class TiendaController {
   usuarioService: any;
   constructor(
