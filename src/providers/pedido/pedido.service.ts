@@ -113,4 +113,49 @@ export class PedidoService {
     const result = await this.pedidoRepository.update(id, updateData);
     return result.affected === 0 ? undefined : result;
   }
+
+  public async getPedidosPorUsuario(idUsuario: number): Promise<Pedido[]> {
+  const usuario = await this.usuarioRepository.findOne({
+    where: { idUsuario },
+  });
+
+  if (!usuario) {
+    throw new HttpException('Usuario no encontrado', 404);
+  }
+
+  const pedidos = await this.pedidoRepository.find({
+    where: { cliente: { idUsuario } },
+    relations: ['cliente', 'barista', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
+    order: { idPedido: 'DESC' }
+  });
+
+  if (!pedidos || pedidos.length === 0) {
+    throw new HttpException('No se encontraron pedidos para este usuario', 404);
+  }
+
+  return pedidos;
+}
+
+public async getPedidosPorTienda(idTienda: number): Promise<Pedido[]> {
+  const tienda = await this.tiendaRepository.findOne({
+    where: { idTienda }
+  });
+
+  if (!tienda) {
+    throw new HttpException('Tienda no encontrada', 404);
+  }
+
+  const pedidos = await this.pedidoRepository.find({
+    where: { tienda: { idTienda } },
+    relations: ['cliente', 'barista', 'tienda', 'detallePedidos', 'detallePedidos.producto'],
+    order: { idPedido: 'DESC' }
+  });
+
+  if (!pedidos || pedidos.length === 0) {
+    throw new HttpException('No se encontraron pedidos para esta tienda', 404);
+  }
+
+  return pedidos;
+}
+
 }

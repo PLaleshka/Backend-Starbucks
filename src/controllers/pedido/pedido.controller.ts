@@ -28,6 +28,18 @@ export class PedidoController {
     return pedido;
   }
 
+  @Get('tienda/:idTienda')
+public async getPedidosPorTienda(@Param('idTienda') idTienda: number): Promise<Pedido[]> {
+  return await this.pedidoService.getPedidosPorTienda(idTienda);
+}
+
+
+  @Get('usuario/:idUsuario')
+public async getPedidosPorUsuario(@Param('idUsuario') idUsuario: number): Promise<Pedido[]> {
+  return await this.pedidoService.getPedidosPorUsuario(idUsuario);
+}
+
+
   @Post()
   async createPedido(@Body() pedidoDto: PedidoCreateRequestDTO): Promise<PedidoResponseDTO> {
     const pedido = await this.pedidoService.crearPedido(pedidoDto);
@@ -42,4 +54,6 @@ export class PedidoController {
   ): Promise<UpdateResult | undefined> {
     return await this.pedidoService.update(id, request);
   }
+
+  
 }

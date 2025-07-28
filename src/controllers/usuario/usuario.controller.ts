@@ -23,7 +23,7 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
-      idTienda: usuario.idTienda // ← ✅ ¡ESTO FALTABA!
+      idTienda: usuario.idTienda 
     }));
   }
 
@@ -107,7 +107,7 @@ export class UsuarioController {
       correoElectronico: usuario.correoElectronico,
       contraseña: usuario.contraseña,
       rol: usuario.rol,
-      idTienda: usuario.idTienda // ✅ AGREGA ESTO TAMBIÉN
+      idTienda: usuario.idTienda 
     }));
   }
 }
