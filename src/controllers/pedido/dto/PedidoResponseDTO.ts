@@ -1,6 +1,7 @@
 import { Expose, Type } from 'class-transformer';
-import { DetallePedido } from '../../database/entities/detalle-pedido.entity';
-import { TiendaEntity } from '../../database/entities/tienda.entity';
+import { UsuarioResponseDTO } from '../../usuario/dto/UsuarioResponseDTO';
+import { TiendaResponseDTO } from '../../tienda/dto/TiendaResponseDTO';
+import { DetallePedidoResponseDTO } from '../../detalle-pedido/dto/DetallePedidoResponseDTO';
 
 export class PedidoResponseDTO {
   @Expose()
@@ -27,13 +28,14 @@ export class PedidoResponseDTO {
   estadoPedido!: string;
 
   @Expose()
-  cliente: any;
+  @Type(() => UsuarioResponseDTO)
+  cliente!: UsuarioResponseDTO;
 
   @Expose()
-  @Type(() => TiendaEntity)
-  tienda!: TiendaEntity;
+  @Type(() => TiendaResponseDTO)
+  tienda!: TiendaResponseDTO;
 
   @Expose()
-  @Type(() => DetallePedido)
-  detallePedidos!: DetallePedido[];
+  @Type(() => DetallePedidoResponseDTO)
+  detallePedidos!: DetallePedidoResponseDTO[];
 }

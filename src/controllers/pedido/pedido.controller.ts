@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Res, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Res, Delete, HttpException } from '@nestjs/common';
 import { IPedidoResponse as IGetPedidoResponse } from './dto/IGetPedidoResponse';
 import { IPostPedidoRequest } from './dto/IPostPedidoRequest';
 import { IPostPedidoResponse } from './dto/IPostPedidoResponse';
@@ -27,16 +27,14 @@ export class PedidoController {
         return this.pedidos;
     }
 
-    @Get(':id')
-    public getpedido(@Param('id') id: number): IGetPedidoResponse {
-            const pedido = this.pedidos.find(
-                c => c.idPedido === Number(id)
-            );
-            if (!pedido) {
-                throw new Error(`pedido con id ${Number(id)} no encontrado`);
-            }
-            return pedido;
-    }
+   @Get(':id')
+async getpedido(@Param('id') id: number): Promise<PedidoResponseDTO> {
+  const pedido = await this.pedidoService.findById(id);
+  if (!pedido) {
+    throw new HttpException(`Pedido con id ${id} no encontrado`, 404);
+  }
+  return plainToInstance(PedidoResponseDTO, pedido, { excludeExtraneousValues: true });
+}
     
 
     @Post()
